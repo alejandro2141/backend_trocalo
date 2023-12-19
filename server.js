@@ -56,7 +56,7 @@ const MAX_DAYS_SEARCH  = 60
 /******************************************************************************************************** */
 /******************************************************************************************************** */
 /****************                                          ********************************************** */
-/****************      PUBLIC LOGIN   USER  18-12-2023    ********************************************** */
+/****************      PUBLIC LOGIN USER  18-12-2023    ********************************************** */
 /****************                                          ********************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
@@ -74,26 +74,22 @@ client.connect()
 console.log("REQUEST: "+JSON.stringify(req.body))
 
 
-//let query_reserve =   "INSERT INTO appointment (  date , start_time,  duration,  center_id, confirmation_status, professional_id, patient_doc_id, patient_name,    patient_email, patient_phone1,  patient_age,  app_available, app_status, app_blocked, app_public,  location1, location2, location3, location4, location5, location6,   app_type_home, app_type_center,  app_type_remote, patient_notification_email_reserved , specialty_reserved , patient_address , calendar_id )"   
-
-//************************************  */
-//        INSERT USER_CREATION
-//************************************  */
-let query_insert_user_creation = `INSERT INTO user_creation 
-(names , last_name1, last_name2 , email, phone, id_number, passwd, address_street_name, address_street_number , address_street_apartment , address_location_zone , address_reference) 
-VALUES  
-('${req.body.names}' , '${req.body.last_name1}' , '${req.body.last_name2}' , '${req.body.email}' ,'${req.body.phone}','${req.body.id_number}'
-,'${req.body.passwd}','${req.body.address_street_name}','${req.body.address_street_number}','${req.body.address_street_apartment}','${req.body.address_location_zone}','${req.body.address_reference}'    ) RETURNING * 
+let query_login = ` SELECT 
+names, last_name1, last_name2, email, phone, address_street_name, address_street_apartment, address_location_zone, address_street_number, address_reference, status, active, id_number    
+FROM user_created 
+WHERE 
+email='${req.body.email}' AND passwd='${req.body.passwd}' ; 
 `
-console.log("QUERY Insert User Creation :"+query_insert_user_creation);
+console.log("query_login :"+query_login);
 
-const resultado = client.query(query_insert_user_creation, (err, result) => {
+const resultado = client.query(query_login, (err, result) => {
     //res.status(200).send(JSON.stringify(result)) ;
     if (err) {
-      console.log('/public_register_user ERR:'+err ) ;
+      console.log('/public_login_user ERR:'+err ) ;
     }
     else {
-    console.log("public_register_user JSON RESPONSE BODY : "+JSON.stringify(result.rows[0]));
+    console.log("/public_login_user JSON RESPONSE BODY : "+JSON.stringify(result.rows[0]));
+    res.status(200).send(JSON.stringify(result)) ; 
     }
     client.end()
 })
