@@ -69,9 +69,7 @@ app.route('/public_login_user')
 
 let response = public_login_user(req) 
 response.then( v => {  console.log("/public_login_user RESPONSE: "+JSON.stringify(v)) ; return (res.status(200).send(JSON.stringify(v))) } )
-    
-
-
+   
 })
 //**************************** */
 // **** public_login_user   ****/
@@ -85,7 +83,7 @@ async function public_login_user(req)
   let user_data_session = await create_session(user_data)
   console.log ("PUBLIC LOGIN USER: user_data_session:"+ JSON.stringify(user_data_session))
   //return concat
-   return ( { ...user_data, ...user_data_session } )
+   return ( user_data_session )
 
 }
 
@@ -155,11 +153,14 @@ async function create_session(userData)
 //**************************** */
 async function create_token(userData)
 {
+  /*
   let dateTime= new String(new Date().getTime())
   let userId = new String(userData.id) 
   let token = userId.length()+"-"+userId+dateTime 
 
   return  token
+*/
+return "111234token3234"
 }
 
 //**************************** */
@@ -167,7 +168,7 @@ async function create_token(userData)
 //**************************** */
 async function validate_token(token)
 { 
-
+/*
   let aux = token.split("-")
   
   let dateTime= new String(new Date().getTime())
@@ -175,7 +176,9 @@ async function validate_token(token)
   let token = userId+dateTime 
 
   return  token
+  */
 
+  return 1
 }
 
 
@@ -259,7 +262,102 @@ const resultado2 = client2.query(query_insert_user, (err, result) => {
 })
 
 
-
- 
-
 })
+
+
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************      USER UPLOAD IMAGE PRODUCT 18-12-2023     ***************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/user_create_product')
+.post(function (req, res) {
+
+  console.log("/user_create_product REQUEST: "+JSON.stringify(req.body))
+  
+  let productId=saveProductInDB(req.body)
+
+  
+  res.status(200).send(JSON.stringify(saveResult)) ; 
+  /*
+  // 1 Create a FIle Name
+  const filename= "productImage_"+req.body.session_data.id+"_"+req.body.img_num
+  
+  // 2 Save File in HD
+  let auxBase64=req.body.image.split(",")
+
+  saveImageProduct( auxBase64[1] , filename ) 
+  
+  // 3 Save reference in DB
+  let aux = saveImageProductInDB( filename,req.body.session_data , req.body.img_num )
+  */
+  
+  //fs.writeFileSync('productImages/logoaaaae2.png', auxBase64[1], 'base64');
+
+  //fetch(req.body.image).then(res => res.blob()).then(bina => {saveImageProduct(bina)} )
+  //const imageblob = b64toBlob(req.body.image) ;
+  //get Image
+})
+
+//**************************** */
+// **** save Image        ****/
+//**************************** */
+async function saveImageProduct(imageB64, filename  )
+{ 
+  const fs = require('node:fs'); 
+  fs.writeFileSync('productImages/'+filename , imageB64, 'base64');
+/*
+  const fs = require('node:fs'); 
+  fs.writeFile('productImages/logoaaaa', Buffer.allocUnsafe(imageBlob,'base64')  , 'binary' , function(err){
+    if (err) throw err
+    console.log('File saved.')
+  })
+*/
+}
+
+//************************************ */
+// **** SAVE IMAGE REFERENCE IN DB  ****/
+//************************************ */
+async function saveProductInDB(product )
+{ 
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  let query_insert_img = `INSERT INTO user_object
+  ( title, description, alternative1, alternative2, alternative3, 
+    others, owner_id ) 
+  VALUES  
+  ('${product.name}' , '${product.description}' , '${product.exchange_option1}' , '${product.exchange_option2}' ,'${product.exchange_option3}',
+   ${product.exchange_other} ,'${product.session_data.id}') RETURNING * 
+  `
+  
+  console.log("QUERY Insert User  :"+query_insert_img);
+  const resultado2 = client.query(query_insert_img, (err, result) => {
+    //res.status(200).send(JSON.stringify(result)) ;
+    if (err) {
+      console.log('saveProductInDB query_insert_user ERR:'+err ) ;
+    }
+    else {
+    console.log("saveProductInDB SUCCESS id  : "+JSON.stringify(result.rows[0].id));
+    return (result.rows[0].id)
+    }
+    
+    client.end()
+  
+  })
+
+
+}
+
+
+
+
