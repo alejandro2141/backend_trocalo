@@ -8,6 +8,12 @@ const { json } = require('body-parser');
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
+// path Devel
+const PATH_PROD_IMG = '../trocalo/public/productImages/'
+// path Prod
+// const PATH_PROD_IMG = '/productImages/'
+
+
 // App
 const app = express();
 
@@ -20,9 +26,16 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true ,limit: '35mb', parameterLimit: 50000 }));
+//app.use(bodyParser.json());
 
+//app.use(express.limit(100000000));
+//app.use(express.json({ limit: '12MB' }));
+
+app.use(express.urlencoded({ extended: true }))
+
+app.use(express.json({limit: '25mb'}));
+app.use(express.urlencoded({ extended: true , limit: '25mb'}));
 
 //************************************************************************************************************/
 //************************************************************************************************************/
@@ -42,15 +55,6 @@ const conn_data = {
   password: 'trocalo_pass',
   port: 5432,
 }
-
-//const MAX_APPOINTMENTS_RESPONSE = 999
-/*
-const MAX_APPOINTMENTS_RESPONSE_XDAY = 100
-const MAX_CALENDARS_SEARCH  = 9999999
-const MAX_DAYS_SEARCH  = 60
-*/
-
-
 
 
 /******************************************************************************************************** */
@@ -83,7 +87,7 @@ async function public_login_user(req)
   let user_data_session = await create_session(user_data)
   console.log ("PUBLIC LOGIN USER: user_data_session:"+ JSON.stringify(user_data_session))
   //return concat
-   return ( user_data_session )
+   return ( { ...user_data_session, ...user_data } )
 
 }
 
@@ -127,8 +131,6 @@ async function create_session(userData)
 
   let token=await create_token(userData)
   
-
-
   let query_insert_session_data = `INSERT INTO session 
   (creation_date ,  user_id , user_name , exp_date , token , token_exp_date , last_login) 
   VALUES  
@@ -282,11 +284,10 @@ app.route('/user_create_product')
 .post(function (req, res) {
 
   console.log("/user_create_product REQUEST: "+JSON.stringify(req.body))
-  
-  let productId=saveProductInDB(req.body)
-
-  
-  res.status(200).send(JSON.stringify(saveResult)) ; 
+  let productCreate = user_create_product(req) ; 
+  productCreate.then( v => {  console.log("/user_create_product RESPONSE: "+JSON.stringify(v)) ; return (res.status(200).send(JSON.stringify(v))) } )
+    
+ // res.status(200).send(JSON.stringify(saveResult)) ; 
   /*
   // 1 Create a FIle Name
   const filename= "productImage_"+req.body.session_data.id+"_"+req.body.img_num
@@ -310,10 +311,38 @@ app.route('/user_create_product')
 //**************************** */
 // **** save Image        ****/
 //**************************** */
+async function user_create_product(req)
+{ 
+  const responseQuery =  await saveProductInDB(req.body)
+  console.log("result insert: "+JSON.stringify(responseQuery))
+  //  responseQuery.then(function(val){  console.log(" Response Query: "+val)} )
+  // console.log(" Response Query: "+responseQuery)
+  
+  //*************************** */
+  //      CREATE IMAGES 
+  //*************************** */
+
+  if (req.body.image1 !=null )
+  {
+    let auxBase64=req.body.image1.split(",")
+    saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref1 ) 
+  }
+  if (req.body.image2 !=null )
+  {
+    let auxBase64=req.body.image2.split(",")
+    saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref2 ) 
+  }
+
+}
+
+//**************************** */
+// **** save Image        ****/
+//**************************** */
 async function saveImageProduct(imageB64, filename  )
 { 
   const fs = require('node:fs'); 
-  fs.writeFileSync('productImages/'+filename , imageB64, 'base64');
+  fs.writeFileSync( PATH_PROD_IMG+filename , imageB64, 'base64');
+  console.log('File filename SAVED  OK : '+ filename )
 /*
   const fs = require('node:fs'); 
   fs.writeFile('productImages/logoaaaa', Buffer.allocUnsafe(imageBlob,'base64')  , 'binary' , function(err){
@@ -326,37 +355,103 @@ async function saveImageProduct(imageB64, filename  )
 //************************************ */
 // **** SAVE IMAGE REFERENCE IN DB  ****/
 //************************************ */
-async function saveProductInDB(product )
+ async function saveProductInDB(product )
 { 
+  let json_response=null;
+
   const { Client } = require('pg')
   const client = new Client(conn_data)
   client.connect() 
   
+
+  let timestamp= new Date().getTime();
   let query_insert_img = `INSERT INTO user_object
   ( title, description, alternative1, alternative2, alternative3, 
-    others, owner_id ) 
+    others, owner_id , img_ref1 , img_ref2, img_ref3, img_ref4, img_ref5 ) 
   VALUES  
   ('${product.name}' , '${product.description}' , '${product.exchange_option1}' , '${product.exchange_option2}' ,'${product.exchange_option3}',
-   ${product.exchange_other} ,'${product.session_data.id}') RETURNING * 
+   ${product.exchange_other} ,'${product.session_data.id}' 
+   , 'img_${product.session_data.id}_1_${timestamp}' 
+   , 'img_${product.session_data.id}_2_${timestamp}'  
+   , 'img_${product.session_data.id}_3_${timestamp}'  
+   , 'img_${product.session_data.id}_4_${timestamp}'  
+   , 'img_${product.session_data.id}_5_${timestamp}'  
+   ) RETURNING * 
   `
-  
-  console.log("QUERY Insert User  :"+query_insert_img);
-  const resultado2 = client.query(query_insert_img, (err, result) => {
-    //res.status(200).send(JSON.stringify(result)) ;
-    if (err) {
-      console.log('saveProductInDB query_insert_user ERR:'+err ) ;
-    }
-    else {
-    console.log("saveProductInDB SUCCESS id  : "+JSON.stringify(result.rows[0].id));
-    return (result.rows[0].id)
+ // console.log("QUERY Insert User  :"+query_insert_img);
+    const result =  await client.query(query_insert_img)
+    
+    //IF SUCCESS FOUND USER
+    if (result.rows.length>0 )
+    {
+    json_response = result  
     }
     
-    client.end()
-  
-  })
+    client.end() 
+    console.log("Product Inserted in DB successfully:"+result.rows[0].id)
+    return json_response ;
+
+
 
 
 }
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************      SEARCH PUBLIC OBJECTS     26-12-2023     ***************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/public_search_objects')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+
+
+  console.log("/public_search_objects  REQUEST: "+JSON.stringify(req.body))
+ 
+  let json_response = null ;
+  let timestamp= new Date().getTime();
+  let query_insert_img = `SELECT * FROM  user_object ; 
+  `
+ // console.log("QUERY Insert User  :"+query_insert_img);
+    const result =  client.query(query_insert_img)
+   
+    console.log("RESULT : "+JSON.stringify(result) )
+    /*
+    //IF SUCCESS FOUND USER
+    if (result.rows !=null )
+    {
+    json_response = result.rows  
+    }
+    
+    client.end() 
+    console.log("/public_search_objects Response : "+ JSON.stringify(json_response) )
+
+
+    */
+    return json_response ;
+   
+})
+
+
+
+
+
+
+
+
+
+
 
 
 
