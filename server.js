@@ -424,23 +424,43 @@ app.route('/public_search_objects')
   let query_insert_img = `SELECT * FROM  user_object ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
-    const result =  client.query(query_insert_img)
+    
+ 
+ const resultado = client.query(query_insert_img, (err, result) => {
+
+  if (err) {
+      console.log(' ERROR QUERY = '+sql ) ;
+      console.log(' ERR = '+err ) ;
+    }
+
+  if (result !=null)
+  {
+  console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+  res.status(200).send(JSON.stringify(result.rows) );
+  }
+  else
+  {
+    res.status(200).send( null ) ;
+  }
+  })
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ /*
+ const result =  client.query(query_insert_img)
    
     console.log("RESULT : "+JSON.stringify(result) )
-    /*
-    //IF SUCCESS FOUND USER
-    if (result.rows !=null )
-    {
-    json_response = result.rows  
-    }
-    
-    client.end() 
-    console.log("/public_search_objects Response : "+ JSON.stringify(json_response) )
-
-
-    */
     return json_response ;
-   
+   */
 })
 
 
