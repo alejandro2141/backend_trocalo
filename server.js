@@ -505,6 +505,56 @@ app.route('/private_get_my_objects')
 })
 
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      GET PROPOSALS RECEIVED                   ***************************************** */
+/****************        28-12-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_get_proposals_received')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_proposals_received  REQUEST: "+JSON.stringify(req.body))
+ 
+  let json_response = null ;
+  let timestamp= new Date().getTime();
+  let query = `SELECT * FROM  proposal WHERE user_id_destination='${req.body.id}'; 
+  `
+
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(query, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
 
 
 
