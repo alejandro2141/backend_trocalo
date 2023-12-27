@@ -332,6 +332,21 @@ async function user_create_product(req)
     let auxBase64=req.body.image2.split(",")
     saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref2 ) 
   }
+  if (req.body.image3 !=null )
+  {
+    let auxBase64=req.body.image3.split(",")
+    saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref3 ) 
+  }
+  if (req.body.image4 !=null )
+  {
+    let auxBase64=req.body.image4.split(",")
+    saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref4 ) 
+  }
+  if (req.body.image5 !=null )
+  {
+    let auxBase64=req.body.image5.split(",")
+    saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref5 ) 
+  }
 
 }
 
@@ -343,13 +358,7 @@ async function saveImageProduct(imageB64, filename  )
   const fs = require('node:fs'); 
   fs.writeFileSync( PATH_PROD_IMG+filename , imageB64, 'base64');
   console.log('File filename SAVED  OK : '+ filename )
-/*
-  const fs = require('node:fs'); 
-  fs.writeFile('productImages/logoaaaa', Buffer.allocUnsafe(imageBlob,'base64')  , 'binary' , function(err){
-    if (err) throw err
-    console.log('File saved.')
-  })
-*/
+
 }
 
 //************************************ */
@@ -371,11 +380,11 @@ async function saveImageProduct(imageB64, filename  )
   VALUES  
   ('${product.name}' , '${product.description}' , '${product.exchange_option1}' , '${product.exchange_option2}' ,'${product.exchange_option3}',
    ${product.exchange_other} ,'${product.session_data.id}' 
-   , 'img_${product.session_data.id}_1_${timestamp}' 
-   , 'img_${product.session_data.id}_2_${timestamp}'  
-   , 'img_${product.session_data.id}_3_${timestamp}'  
-   , 'img_${product.session_data.id}_4_${timestamp}'  
-   , 'img_${product.session_data.id}_5_${timestamp}'  
+   , 'img_${product.session_data.id}_1_${timestamp}.jpg' 
+   , 'img_${product.session_data.id}_2_${timestamp}.jpg'  
+   , 'img_${product.session_data.id}_3_${timestamp}.jpg'  
+   , 'img_${product.session_data.id}_4_${timestamp}.jpg'  
+   , 'img_${product.session_data.id}_5_${timestamp}.jpg'  
    ) RETURNING * 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
@@ -390,9 +399,6 @@ async function saveImageProduct(imageB64, filename  )
     client.end() 
     console.log("Product Inserted in DB successfully:"+result.rows[0].id)
     return json_response ;
-
-
-
 
 }
 
@@ -415,8 +421,6 @@ app.route('/public_search_objects')
   const client = new Client(conn_data)
   client.connect() 
   
-
-
   console.log("/public_search_objects  REQUEST: "+JSON.stringify(req.body))
  
   let json_response = null ;
@@ -424,46 +428,81 @@ app.route('/public_search_objects')
   let query_insert_img = `SELECT * FROM  user_object ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
-    
- 
+     
  const resultado = client.query(query_insert_img, (err, result) => {
 
-  if (err) {
+  if (err) 
+  {
       console.log(' ERROR QUERY = '+sql ) ;
       console.log(' ERR = '+err ) ;
-    }
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
 
-  if (result !=null)
-  {
-  console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
-  res.status(200).send(JSON.stringify(result.rows) );
-  }
-  else
-  {
-    res.status(200).send( null ) ;
-  }
   })
 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- /*
- const result =  client.query(query_insert_img)
-   
-    console.log("RESULT : "+JSON.stringify(result) )
-    return json_response ;
-   */
 })
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************      GET MY OBJECTS  28-12-2023               ***************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
 
+app.route('/private_get_my_objects')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_my_objects  REQUEST: "+JSON.stringify(req.body))
+ 
+  let json_response = null ;
+  let timestamp= new Date().getTime();
+  let query = `SELECT * FROM  user_object WHERE owner_id='${req.body.id}'; 
+  `
+
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(query, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
 
 
 
