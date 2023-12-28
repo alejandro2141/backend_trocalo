@@ -556,11 +556,163 @@ app.route('/private_get_proposals_received')
 
 })
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      GET PROPOSALS RECEIVED                   ***************************************** */
+/****************        28-12-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_get_proposals_sent')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_proposals_sent REQUEST: "+JSON.stringify(req.body))
+ 
+  let query_get_proposals = "SELECT * FROM  proposal WHERE user_id_source="+req.body.id  ;
+
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultQuery= client.query(query_get_proposals, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_get_proposals ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_get_proposals_sent'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
 
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      SAVE EXCHANGE PROPOSAL                    ***************************************** */
+/****************        28-12-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
 
 
+app.route('/save_proposal')
+.post(function (req, res) {
 
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/save_proposal  REQUEST: "+JSON.stringify(req.body))
+
+  let timestamp= new Date().toISOString();
+
+
+  let sql_columns     = ""
+  let sql_columns_val = ""
+
+  sql_columns     = sql_columns.concat( "timestamp" ) 
+  sql_columns_val = sql_columns_val.concat( "'"+timestamp+"'" ) 
+
+  sql_columns     = sql_columns.concat( ",updated" ) 
+  sql_columns_val = sql_columns_val.concat( ",'"+timestamp+"'" ) 
+
+  sql_columns     = sql_columns.concat( ",user_id_creator" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
+
+  sql_columns     = sql_columns.concat( ",user_id_destination" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].owner_id ) 
+
+  sql_columns     = sql_columns.concat( ",amount" ) 
+  sql_columns_val = sql_columns_val.concat( ",17990 " ) 
+
+  sql_columns     = sql_columns.concat( ",status" ) 
+  sql_columns_val = sql_columns_val.concat( ",1" ) 
+
+  sql_columns     = sql_columns.concat( ",loop_number" ) 
+  sql_columns_val = sql_columns_val.concat( ",1" ) 
+
+  sql_columns     = sql_columns.concat( ",user_id_source" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
+
+  sql_columns     = sql_columns.concat( ",dest_object1" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].id ) 
+
+  sql_columns     = sql_columns.concat( ",source_object1" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[0].id ) 
+
+  if (req.body.objects_offered[1] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object2" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[1].id ) 
+  }
+
+  if (req.body.objects_offered[2] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object3" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[2].id ) 
+  }
+
+  if (req.body.objects_offered[3] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object4" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[3].id ) 
+  }
+
+  if (req.body.objects_offered[4] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object5" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[4].id ) 
+  }
+
+let sql_query = "INSERT INTO proposal ("+ sql_columns +") VALUES ("+sql_columns_val+") RETURNING * " ; 
+
+console.log("  SQL INSERT PROPOSAL : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          res.status(200).send( null ) ;
+        }
+    }
+  
+    })
+    
+})
 
 
 
