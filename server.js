@@ -376,10 +376,10 @@ async function saveImageProduct(imageB64, filename  )
   let timestamp= new Date().getTime();
   let query_insert_img = `INSERT INTO user_object
   ( title, description, alternative1, alternative2, alternative3, 
-    others, owner_id , img_ref1 , img_ref2, img_ref3, img_ref4, img_ref5 ) 
+    others, owner_id , owner_name , img_ref1 , img_ref2, img_ref3, img_ref4, img_ref5 ) 
   VALUES  
   ('${product.name}' , '${product.description}' , '${product.exchange_option1}' , '${product.exchange_option2}' ,'${product.exchange_option3}',
-   ${product.exchange_other} ,'${product.session_data.id}' 
+   ${product.exchange_other} ,'${product.session_data.id}' ,'${product.session_data.name} ' 
    , 'img_${product.session_data.id}_1_${timestamp}.jpg' 
    , 'img_${product.session_data.id}_2_${timestamp}.jpg'  
    , 'img_${product.session_data.id}_3_${timestamp}.jpg'  
@@ -685,6 +685,19 @@ app.route('/save_proposal')
   sql_columns     = sql_columns.concat( ",source_object5" ) 
   sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[4].id ) 
   }
+// set OBject Owner Name
+  if ( req.body.object_wanted[0].owner_name  !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",object_owner_name" ) 
+  sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].owner_name+"'" ) 
+  }
+// set Propposal Title
+if ( req.body.object_wanted[0].title  !=null  )
+{
+sql_columns     = sql_columns.concat( ",title" ) 
+sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].title+"'" ) 
+}
+
 
 let sql_query = "INSERT INTO proposal ("+ sql_columns +") VALUES ("+sql_columns_val+") RETURNING * " ; 
 
@@ -713,6 +726,57 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
     })
     
 })
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE GET OBJECTS PROPOSALS            ***************************************** */
+/****************        04-01-2024                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_get_objects')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_objects REQUEST: "+JSON.stringify(req.body))
+ 
+  let query_get_proposals = "SELECT * FROM  user_object WHERE ID IN ("+req.body.objects_ids+")"  ;
+
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultQuery= client.query(query_get_proposals, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_get_proposals ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_get_objects'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
+
+
 
 
 
