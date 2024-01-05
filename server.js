@@ -936,7 +936,7 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
 /******************************************************************************************************** */
 /****************                                               ***************************************** */
 /****************      PRIVATE UPDATE PROPOSAL                  ***************************************** */
-/****************        28-12-2023                             ***************************************** */
+/****************        05-01-2023                             ***************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
 // Comments:
@@ -954,6 +954,18 @@ app.route('/private_update_proposal')
   console.log("/private_update_proposal  REQUEST: "+JSON.stringify(req.body))
 
   let timestamp= new Date().toISOString();
+
+  let sql_query = "UPDATE proposal SET user_id_destination = "+req.body.proposal_original+" "
+
+
+
+/*
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
+*/
+
+
 /*
   let sql_columns     = ""
   let sql_columns_val = ""
