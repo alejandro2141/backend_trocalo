@@ -268,6 +268,77 @@ const resultado2 = client2.query(query_insert_user, (err, result) => {
 
 
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************      DELETE OBJECT 18-12-2023                 ***************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_delete_object')
+.post(function (req, res) {
+
+  console.log("/private_delete_object REQUEST: "+JSON.stringify(req.body))
+    
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+
+  let query_insert_img = `UPDATE user_object SET deleted_by_owner = TRUE  WHERE id= '${req.body.object_id}'  `
+
+
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(query_insert_img, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+sql ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_delete_object'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+
+ // res.status(200).send(JSON.stringify(saveResult)) ; 
+  /*
+  // 1 Create a FIle Name
+  const filename= "productImage_"+req.body.session_data.id+"_"+req.body.img_num
+  
+  // 2 Save File in HD
+  let auxBase64=req.body.image.split(",")
+
+  saveImageProduct( auxBase64[1] , filename ) 
+  
+  // 3 Save reference in DB
+  let aux = saveImageProductInDB( filename,req.body.session_data , req.body.img_num )
+  */
+  
+  //fs.writeFileSync('productImages/logoaaaae2.png', auxBase64[1], 'base64');
+
+  //fetch(req.body.image).then(res => res.blob()).then(bina => {saveImageProduct(bina)} )
+  //const imageblob = b64toBlob(req.body.image) ;
+  //get Image
+})
+
+
 
 /******************************************************************************************************** */
 /******************************************************************************************************** */
@@ -307,6 +378,9 @@ app.route('/user_create_product')
   //const imageblob = b64toBlob(req.body.image) ;
   //get Image
 })
+
+
+
 
 //**************************** */
 // **** save Image        ****/
@@ -425,7 +499,7 @@ app.route('/public_search_objects')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_insert_img = `SELECT * FROM  user_object ; 
+  let query_insert_img = `SELECT * FROM  user_object  WHERE  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL ); ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -475,10 +549,12 @@ app.route('/private_get_my_objects')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query = `SELECT * FROM  user_object WHERE owner_id='${req.body.id}'; 
-  `
+//  let query = `SELECT * FROM  user_object WHERE owner_id='${req.body.id}   ';   `
+//let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id} AND  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL )  ';   `
 
- // console.log("QUERY Insert User  :"+query_insert_img);
+let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id}' AND  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL );`
+
+// console.log("QUERY Insert User  :"+query_insert_img);
      
  const resultado = client.query(query, (err, result) => {
 
@@ -503,6 +579,68 @@ app.route('/private_get_my_objects')
   })
 
 })
+
+
+
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************      GET PARTNER OBJECTS  28-12-2023          ***************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_get_partner_objects')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_partner_objects  REQUEST: "+JSON.stringify(req.body))
+ 
+  let json_response = null ;
+  let timestamp= new Date().getTime();
+//  let query = `SELECT * FROM  user_object WHERE owner_id='${req.body.id}   ';   `
+//let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id} AND  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL )  ';   `
+
+let query = `SELECT * FROM user_object WHERE owner_id='${req.body.partner_id}' AND  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL );`
+
+// console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(query, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_get_partner_objects'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
+
+
+
+
+
 
 
 /******************************************************************************************************** */
@@ -552,14 +690,16 @@ app.route('/private_get_proposals_received')
       }
   }
 
-  })
+  client.end()
 
+  })
+  
 })
 
 /******************************************************************************************************** */
 /******************************************************************************************************** */
 /****************                                               ***************************************** */
-/****************      GET PROPOSALS RECEIVED                   ***************************************** */
+/****************      GET PROPOSALS SENT                       ***************************************** */
 /****************        28-12-2023                             ***************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
@@ -593,6 +733,7 @@ app.route('/private_get_proposals_sent')
       {
       console.log('RESULT private_get_proposals_sent'+JSON.stringify(result.rows) ) ;
       res.status(200).send(JSON.stringify(result.rows) );
+
       }
       else
       {
@@ -600,9 +741,66 @@ app.route('/private_get_proposals_sent')
       }
   }
 
+  client.end()
+
   })
 
+  
 })
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE DELETE PROPOSAL                  ***************************************** */
+/****************        28-12-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/cancel_proposal')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_cancel_proposal REQUEST: "+JSON.stringify(req.body))
+ 
+  //DELETE FROM table_name WHERE condition
+  let query_get_proposals = "DELETE FROM proposal WHERE id="+req.body.object_id  ;
+
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultQuery= client.query(query_get_proposals, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_get_proposals ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_cancel_proposal'+JSON.stringify(result) ) ;
+      res.status(200).send(JSON.stringify(result) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  client.end()
+
+  })
+
+
+})
+
 
 
 /******************************************************************************************************** */
@@ -722,10 +920,150 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
           res.status(200).send( null ) ;
         }
     }
+
+    client.end()
   
     })
     
 })
+
+
+
+
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE UPDATE PROPOSAL                  ***************************************** */
+/****************        28-12-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+
+app.route('/private_update_proposal')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_update_proposal  REQUEST: "+JSON.stringify(req.body))
+
+  let timestamp= new Date().toISOString();
+/*
+  let sql_columns     = ""
+  let sql_columns_val = ""
+
+  sql_columns     = sql_columns.concat( "timestamp" ) 
+  sql_columns_val = sql_columns_val.concat( "'"+timestamp+"'" ) 
+
+  sql_columns     = sql_columns.concat( ",updated" ) 
+  sql_columns_val = sql_columns_val.concat( ",'"+timestamp+"'" ) 
+
+  sql_columns     = sql_columns.concat( ",user_id_creator" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
+
+  sql_columns     = sql_columns.concat( ",user_id_destination" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].owner_id ) 
+
+  sql_columns     = sql_columns.concat( ",amount" ) 
+  sql_columns_val = sql_columns_val.concat( ",17990 " ) 
+
+  sql_columns     = sql_columns.concat( ",status" ) 
+  sql_columns_val = sql_columns_val.concat( ",1" ) 
+
+  sql_columns     = sql_columns.concat( ",loop_number" ) 
+  sql_columns_val = sql_columns_val.concat( ",1" ) 
+
+  sql_columns     = sql_columns.concat( ",user_id_source" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
+
+  sql_columns     = sql_columns.concat( ",dest_object1" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].id ) 
+
+  sql_columns     = sql_columns.concat( ",source_object1" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[0].id ) 
+
+  if (req.body.objects_offered[1] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object2" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[1].id ) 
+  }
+
+  if (req.body.objects_offered[2] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object3" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[2].id ) 
+  }
+
+  if (req.body.objects_offered[3] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object4" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[3].id ) 
+  }
+
+  if (req.body.objects_offered[4] !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",source_object5" ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[4].id ) 
+  }
+// set OBject Owner Name
+  if ( req.body.object_wanted[0].owner_name  !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",object_owner_name" ) 
+  sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].owner_name+"'" ) 
+  }
+// set Propposal Title
+if ( req.body.object_wanted[0].title  !=null  )
+{
+sql_columns     = sql_columns.concat( ",title" ) 
+sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].title+"'" ) 
+}
+*/
+
+
+/*
+let sql_query = "INSERT INTO proposal ("+ sql_columns +") VALUES ("+sql_columns_val+") RETURNING * " ; 
+
+console.log("  SQL INSERT PROPOSAL : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    */
+    
+})
+
+
+
+
+
+
+
 
 
 /******************************************************************************************************** */
@@ -772,12 +1110,122 @@ app.route('/private_get_objects')
       }
   }
 
+  client.end()
+
   })
 
 })
 
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE PROPOSAL ACCEPT                  ***************************************** */
+/****************        04-01-2024                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
 
+app.route('/private_proposal_accept')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_proposal_accept  REQUEST: "+JSON.stringify(req.body))
+ 
+  let query_get_proposals = "UPDATE proposal SET status=100 WHERE id='"+req.body.proposal_id+"' "  ;
+
+  /*
+  UPDATE table_name
+  SET column1 = value1, column2 = value2, ...
+  WHERE condition;
+  */
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultQuery= client.query(query_get_proposals, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_get_proposals ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_proposal_accept '+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  client.end()
+
+  })
+
+})
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE  PROPOSAL CANCEL                 ***************************************** */
+/****************        04-01-2024                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_proposal_cancel')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_proposal_cancel  REQUEST: "+JSON.stringify(req.body))
+ 
+  let query_get_proposals = "UPDATE proposal SET status=200 WHERE id='"+req.body.proposal_id+"' "  ;
+
+  /*
+  UPDATE table_name
+  SET column1 = value1, column2 = value2, ...
+  WHERE condition;
+  */
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultQuery= client.query(query_get_proposals, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_get_proposals ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT private_proposal_cancel '+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  client.end()
+
+  })
+
+})
 
 
 
