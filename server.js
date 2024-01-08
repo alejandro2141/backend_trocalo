@@ -826,7 +826,6 @@ app.route('/save_proposal')
 
   let timestamp= new Date().toISOString();
 
-
   let sql_columns     = ""
   let sql_columns_val = ""
 
@@ -883,12 +882,26 @@ app.route('/save_proposal')
   sql_columns     = sql_columns.concat( ",source_object5" ) 
   sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[4].id ) 
   }
-// set OBject Owner Name
+  // set Creator Name 
+  if ( req.body.session_data.name !=null  )
+  {
+  sql_columns     = sql_columns.concat( ",creator_name" ) 
+  sql_columns_val = sql_columns_val.concat( ",'"+req.body.session_data.name+"'" ) 
+  }
+  // set Dest Owner Name
   if ( req.body.object_wanted[0].owner_name  !=null  )
   {
-  sql_columns     = sql_columns.concat( ",object_owner_name" ) 
+  sql_columns     = sql_columns.concat( ",dest_owner_name" ) 
   sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].owner_name+"'" ) 
   }
+  // set source Owner Name
+  if ( req.body.objects_offered[0].owner_name  !=null )
+  {
+    sql_columns     = sql_columns.concat( ",source_owner_name" ) 
+    sql_columns_val = sql_columns_val.concat( ",'"+req.body.objects_offered[0].owner_name+"'" ) 
+  }
+  
+
 // set Propposal Title
 if ( req.body.object_wanted[0].title  !=null  )
 {
@@ -955,93 +968,88 @@ app.route('/private_update_proposal')
 
   let timestamp= new Date().toISOString();
 
-  let sql_query = "UPDATE proposal SET user_id_destination = "+req.body.proposal_original+" "
+  let sql_query = `UPDATE proposal SET 
+  user_id_destination = ${req.body.proposal_original.user_id_source}  ,
+  user_id_source =  ${req.body.proposal_original.user_id_destination} ,  `
 
+  if (req.body.destObjects[0] != null)
+  { sql_query= sql_query+` source_object1 =  ${req.body.destObjects[0].id} ,` }
+  else { sql_query= sql_query+` source_object1 = null,` }
+  if (req.body.destObjects[1] != null)
+  { sql_query= sql_query+` source_object2 =  ${req.body.destObjects[1].id} ,` }
+  else { sql_query= sql_query+` source_object2 = null,` }
+  if (req.body.destObjects[2] != null)
+  { sql_query= sql_query+` source_object3 =  ${req.body.destObjects[2].id} ,` }
+  else { sql_query= sql_query+` source_object3 = null,` }
+  if (req.body.destObjects[3] != null)
+  { sql_query= sql_query+` source_object4 =  ${req.body.destObjects[3].id} ,` }
+  else { sql_query= sql_query+` source_object4 = null,` }
+  if (req.body.destObjects[4] != null)
+  { sql_query= sql_query+` source_object5 =  ${req.body.destObjects[4].id} ,` }
+  else { sql_query= sql_query+` source_object5 = null,` }
+ 
+  if (req.body.sourceObjects[0] != null)
+  { sql_query= sql_query+` dest_object1 =  ${req.body.sourceObjects[0].id} ,` }
+  else { sql_query= sql_query+` dest_object1 =  null,` }
+  if (req.body.sourceObjects[1] != null)
+  { sql_query= sql_query+` dest_object2 =  ${req.body.sourceObjects[1].id} ,` }
+  else { sql_query= sql_query+` dest_object2 =  null,` }
+  if (req.body.sourceObjects[2] != null)
+  { sql_query= sql_query+` dest_object3 =  ${req.body.sourceObjects[2].id} ,` }
+  else { sql_query= sql_query+` dest_object3 =  null,` }
+  if (req.body.sourceObjects[3] != null)
+  { sql_query= sql_query+` dest_object4 =  ${req.body.sourceObjects[3].id} ,` }
+  else { sql_query= sql_query+` dest_object4 =  null,` }
+  if (req.body.sourceObjects[4] != null)
+  { sql_query= sql_query+` dest_object5 =  ${req.body.sourceObjects[4].id} ,` }
+  else { sql_query= sql_query+` dest_object5 =  null,` }
 
+  sql_query= sql_query+` source_owner_name =  '${req.body.proposal_original.dest_owner_name}' ,
+  dest_owner_name =  '${req.body.proposal_original.source_owner_name}' 
+  WHERE  id=  ${req.body.proposal_original.id}    ; 
+  ` 
 
 /*
-UPDATE table_name
-SET column1 = value1, column2 = value2, ...
-WHERE condition;
+let sql_query = `UPDATE proposal SET 
+   `
+
+  if (req.body.destObjects[0] != null)
+  { sql_query= sql_query+` dest_object1 =  ${req.body.destObjects[0].id} ,` }
+  else { sql_query= sql_query+` dest_object1 = null,` }
+  if (req.body.destObjects[1] != null)
+  { sql_query= sql_query+` dest_object2 =  ${req.body.destObjects[1].id} ,` }
+  else { sql_query= sql_query+` dest_object2 = null,` }
+  if (req.body.destObjects[2] != null)
+  { sql_query= sql_query+` dest_object3 =  ${req.body.destObjects[2].id} ,` }
+  else { sql_query= sql_query+` dest_object3 = null,` }
+  if (req.body.destObjects[3] != null)
+  { sql_query= sql_query+` dest_object4 =  ${req.body.destObjects[3].id} ,` }
+  else { sql_query= sql_query+` dest_object4 = null,` }
+  if (req.body.destObjects[4] != null)
+  { sql_query= sql_query+` dest_object5 =  ${req.body.destObjects[4].id} ,` }
+  else { sql_query= sql_query+` source_object5 = null,` }
+ 
+  if (req.body.sourceObjects[0] != null)
+  { sql_query= sql_query+` source_object1 =  ${req.body.sourceObjects[0].id} ,` }
+  else { sql_query= sql_query+` source_object1 =  null,` }
+  if (req.body.sourceObjects[1] != null)
+  { sql_query= sql_query+` source_object2 =  ${req.body.sourceObjects[1].id} ,` }
+  else { sql_query= sql_query+` source_object2 =  null,` }
+  if (req.body.sourceObjects[2] != null)
+  { sql_query= sql_query+` source_object3 =  ${req.body.sourceObjects[2].id} ,` }
+  else { sql_query= sql_query+` source_object3 =  null,` }
+  if (req.body.sourceObjects[3] != null)
+  { sql_query= sql_query+` source_object4 =  ${req.body.sourceObjects[3].id} ,` }
+  else { sql_query= sql_query+` source_object4 =  null,` }
+  if (req.body.sourceObjects[4] != null)
+  { sql_query= sql_query+` source_object5 =  ${req.body.sourceObjects[4].id} ,` }
+  else { sql_query= sql_query+` source_object5 =  null,` }
+
+  sql_query= sql_query+` WHERE id=  ${req.body.proposal_original.id}    ; 
+  `
 */
 
-
-/*
-  let sql_columns     = ""
-  let sql_columns_val = ""
-
-  sql_columns     = sql_columns.concat( "timestamp" ) 
-  sql_columns_val = sql_columns_val.concat( "'"+timestamp+"'" ) 
-
-  sql_columns     = sql_columns.concat( ",updated" ) 
-  sql_columns_val = sql_columns_val.concat( ",'"+timestamp+"'" ) 
-
-  sql_columns     = sql_columns.concat( ",user_id_creator" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
-
-  sql_columns     = sql_columns.concat( ",user_id_destination" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].owner_id ) 
-
-  sql_columns     = sql_columns.concat( ",amount" ) 
-  sql_columns_val = sql_columns_val.concat( ",17990 " ) 
-
-  sql_columns     = sql_columns.concat( ",status" ) 
-  sql_columns_val = sql_columns_val.concat( ",1" ) 
-
-  sql_columns     = sql_columns.concat( ",loop_number" ) 
-  sql_columns_val = sql_columns_val.concat( ",1" ) 
-
-  sql_columns     = sql_columns.concat( ",user_id_source" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
-
-  sql_columns     = sql_columns.concat( ",dest_object1" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].id ) 
-
-  sql_columns     = sql_columns.concat( ",source_object1" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[0].id ) 
-
-  if (req.body.objects_offered[1] !=null  )
-  {
-  sql_columns     = sql_columns.concat( ",source_object2" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[1].id ) 
-  }
-
-  if (req.body.objects_offered[2] !=null  )
-  {
-  sql_columns     = sql_columns.concat( ",source_object3" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[2].id ) 
-  }
-
-  if (req.body.objects_offered[3] !=null  )
-  {
-  sql_columns     = sql_columns.concat( ",source_object4" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[3].id ) 
-  }
-
-  if (req.body.objects_offered[4] !=null  )
-  {
-  sql_columns     = sql_columns.concat( ",source_object5" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[4].id ) 
-  }
-// set OBject Owner Name
-  if ( req.body.object_wanted[0].owner_name  !=null  )
-  {
-  sql_columns     = sql_columns.concat( ",object_owner_name" ) 
-  sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].owner_name+"'" ) 
-  }
-// set Propposal Title
-if ( req.body.object_wanted[0].title  !=null  )
-{
-sql_columns     = sql_columns.concat( ",title" ) 
-sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].title+"'" ) 
-}
-*/
-
-
-/*
-let sql_query = "INSERT INTO proposal ("+ sql_columns +") VALUES ("+sql_columns_val+") RETURNING * " ; 
-
-console.log("  SQL INSERT PROPOSAL : "+sql_query);
+console.log("SQL UPDATE PROPOSAL:"+sql_query);
 
     const resultado = client.query(sql_query, (err, result) => {
 
@@ -1054,7 +1062,7 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
     {
       if (result !=null)
         {
-        console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+        console.log('RESULT private_update_proposal'+JSON.stringify(result.rows) ) ;
         res.status(200).send(JSON.stringify(result.rows) );
         }
         else
@@ -1066,7 +1074,7 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
     client.end()
   
     })
-    */
+    
     
 })
 
