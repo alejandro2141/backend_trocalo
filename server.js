@@ -752,7 +752,7 @@ app.route('/private_get_proposals_sent')
 /******************************************************************************************************** */
 /******************************************************************************************************** */
 /****************                                               ***************************************** */
-/****************      PRIVATE DELETE PROPOSAL                  ***************************************** */
+/****************      PRIVATE CANCEL PROPOSAL                  ***************************************** */
 /****************        28-12-2023                             ***************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
@@ -1246,6 +1246,139 @@ app.route('/private_proposal_cancel')
   })
 
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE SEND COMMENTS                    ***************************************** */
+/****************        08-01-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+
+app.route('/private_send_comment')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_send_comment  REQUEST: "+JSON.stringify(req.body))
+
+//{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
+
+let sql_query = ` INSERT INTO comment 
+( timestamp, user_id , comment, feeling, user_name) 
+VALUES 
+('${req.body.timestamp}', '${req.body.session_data.id}', '${req.body.text_message}', '${req.body.feeling}', '${req.body.session_data.name}'   ) RETURNING *  
+;` 
+
+console.log("  SQL INSERT PROPOSAL : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE GET  COMMENTS                    ***************************************** */
+/****************        08-01-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+
+app.route('/private_get_comments')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_comments  REQUEST: "+JSON.stringify(req.body))
+//{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
+
+let sql_query = `SELECT * FROM comment WHERE user_id = ${req.body.session_data.id}  ; `
+
+console.log("private_get_comments : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT private_get_comments'+JSON.stringify(result.rows) ) ;
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+
+
+
+
 
 
 
