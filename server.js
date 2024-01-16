@@ -450,7 +450,7 @@ async function saveImageProduct(imageB64, filename  )
   let timestamp= new Date().getTime();
   let query_insert_img = `INSERT INTO user_object
   ( title, description, alternative1, alternative2, alternative3, 
-    others, owner_id , owner_name , img_ref1 , img_ref2, img_ref3, img_ref4, img_ref5 ) 
+    others, owner_id , owner_name , img_ref1 , img_ref2, img_ref3, img_ref4, img_ref5, category1, category2, category3 ) 
   VALUES  
   ('${product.name}' , '${product.description}' , '${product.exchange_option1}' , '${product.exchange_option2}' ,'${product.exchange_option3}',
    ${product.exchange_other} ,'${product.session_data.id}' ,'${product.session_data.name} ' 
@@ -459,6 +459,9 @@ async function saveImageProduct(imageB64, filename  )
    , 'img_${product.session_data.id}_3_${timestamp}.jpg'  
    , 'img_${product.session_data.id}_4_${timestamp}.jpg'  
    , 'img_${product.session_data.id}_5_${timestamp}.jpg'  
+   ,  ${product.category1}
+   ,  ${product.category2}
+   ,  ${product.category3}
    ) RETURNING * 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
@@ -1290,7 +1293,7 @@ VALUES
 ('${req.body.timestamp}', '${req.body.session_data.id}', '${req.body.text_message}', '${req.body.feeling}', '${req.body.session_data.name}'   ) RETURNING *  
 ;` 
 
-console.log("  SQL INSERT PROPOSAL : "+sql_query);
+console.log("  SQL INSERT Comment : "+sql_query);
 
     const resultado = client.query(sql_query, (err, result) => {
 
@@ -1344,7 +1347,7 @@ app.route('/private_get_comments')
   console.log("/private_get_comments  REQUEST: "+JSON.stringify(req.body))
 //{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
 
-let sql_query = `SELECT * FROM comment WHERE user_id = ${req.body.session_data.id}  ; `
+let sql_query = `SELECT * FROM comment WHERE user_id = ${req.body.session_data.id}  ORDER BY id DESC ; `
 
 console.log("private_get_comments : "+sql_query);
 
