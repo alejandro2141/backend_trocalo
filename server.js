@@ -903,6 +903,13 @@ app.route('/save_proposal')
     sql_columns     = sql_columns.concat( ",source_owner_name" ) 
     sql_columns_val = sql_columns_val.concat( ",'"+req.body.objects_offered[0].owner_name+"'" ) 
   }
+  // set proposal_duration
+    if ( req.body.proposal_duration !=null )
+    {
+      sql_columns     = sql_columns.concat( ",proposal_days" ) 
+      sql_columns_val = sql_columns_val.concat( ",'"+req.body.proposal_duration+"'" ) 
+    }
+    
   
 
 // set Propposal Title
