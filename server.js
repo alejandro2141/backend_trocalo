@@ -502,15 +502,15 @@ app.route('/public_search_objects')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_insert_img = `SELECT * FROM  user_object  WHERE  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL ); ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
- const resultado = client.query(query_insert_img, (err, result) => {
+ const resultado = client.query(query_search_object , (err, result) => {
 
   if (err) 
   {
-      console.log(' ERROR QUERY = '+sql ) ;
+      console.log(' ERROR QUERY = '+query_search_object ) ;
       console.log(' ERR = '+err ) ;
   }
   else 
@@ -554,8 +554,8 @@ app.route('/private_get_my_objects')
   let timestamp= new Date().getTime();
 //  let query = `SELECT * FROM  user_object WHERE owner_id='${req.body.id}   ';   `
 //let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id} AND  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL )  ';   `
-
-let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id}' AND  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL );`
+// AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )
+let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id}' AND  (deleted_by_owner = FALSE OR  deleted_by_owner IS  NULL )   ;`
 
 // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -1022,7 +1022,6 @@ app.route('/private_update_proposal')
 /*
 let sql_query = `UPDATE proposal SET 
    `
-
   if (req.body.destObjects[0] != null)
   { sql_query= sql_query+` dest_object1 =  ${req.body.destObjects[0].id} ,` }
   else { sql_query= sql_query+` dest_object1 = null,` }
@@ -1151,6 +1150,7 @@ app.route('/private_get_objects')
 /******************************************************************************************************** */
 /****************                                               ***************************************** */
 /****************      PRIVATE PROPOSAL ACCEPT                  ***************************************** */
+/****************      SET STATUS TO 100                        ***************************************** */
 /****************        04-01-2024                             ***************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
@@ -1161,46 +1161,95 @@ app.route('/private_get_objects')
 app.route('/private_proposal_accept')
 .post(function (req, res) {
 
-  const { Client } = require('pg')
-  const client = new Client(conn_data)
-  client.connect() 
-  
   console.log("/private_proposal_accept  REQUEST: "+JSON.stringify(req.body))
- 
-  let query_get_proposals = "UPDATE proposal SET status=100 WHERE id='"+req.body.proposal_id+"' "  ;
+  private_proposal_accept(req.body.proposal_id).then(result => { res.status(200).send(JSON.stringify(result) ); }   )
 
-  /*
-  UPDATE table_name
-  SET column1 = value1, column2 = value2, ...
-  WHERE condition;
-  */
- // console.log("QUERY Insert User  :"+query_insert_img);
-     
- const resultQuery= client.query(query_get_proposals, (err, result) => {
+ //eq.body.proposal_id
+})
 
-  if (err) 
+
+//**************************************************** */
+// ****  BLOCK OBJECTS                              ****/
+//**************************************************** */
+async function private_proposal_accept(id)
+{  
+  //1st Accept Proposal, Update to 100 status in DB
+  let objects_list = await accept_proposal(id) 
+  console.log("2.- after objects_list "+ JSON.stringify(objects_list) );
+  //2nd Mark all objects to BLOCK in DB
+  let objects_blocked = await blockObjects(objects_list,id)
+
+  let json_response = {}
+
+  if (objects_blocked != null)
   {
-      console.log(' ERROR QUERY = '+query_get_proposals ) ;
-      console.log(' ERR = '+err ) ;
-  }
+    json_response.response_code = 0  
+  } 
   else 
   {
-    if (result !=null)
-      {
-      console.log('RESULT private_proposal_accept '+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
-      }
-      else
-      {
-        res.status(200).send( null ) ;
-      }
+    json_response.response_code = 100   
   }
 
-  client.end()
+  return json_response
+  
+}
 
-  })
+//**************************************************** */
+// ****  ACCEPT PROPOSAL                            ****/
+//**************************************************** */
+async function accept_proposal(proposal_id)
+{ 
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  await client.connect() 
+   
+  let query_get_proposals = "UPDATE proposal SET status=100 WHERE id='"+proposal_id+"' RETURNING  source_object1,source_object2,source_object3,source_object4,source_object5 ,  dest_object1, dest_object2, dest_object3, dest_object4, dest_object5    "  ;
+  
+  const res = await client.query(query_get_proposals) 
+  client.end() 
+  console.log("1.- accept_proposal "+ JSON.stringify(res.rows[0]) );
 
-})
+  return res.rows[0] ;
+}
+
+
+//**************************************************** */
+// ****  BLOCK OBJECTS                              ****/
+//**************************************************** */
+async function blockObjects(object_list,proposal_id)
+{ 
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  await client.connect() 
+  
+  let aux_obj_list =  []
+  aux_obj_list.push(object_list.source_object1)
+  aux_obj_list.push(object_list.source_object2)
+  aux_obj_list.push(object_list.source_object3)
+  aux_obj_list.push(object_list.source_object4)
+  aux_obj_list.push(object_list.source_object5)
+   
+  aux_obj_list.push(object_list.dest_object1)
+  aux_obj_list.push(object_list.dest_object2)
+  aux_obj_list.push(object_list.dest_object3)
+  aux_obj_list.push(object_list.dest_object4)
+  aux_obj_list.push(object_list.dest_object5)
+  
+  let aux_obj_list_filtered = aux_obj_list.filter(function (el) { return el != null; });
+
+  let query_block_objects = "UPDATE user_object SET blocked_due_proposal_accepted=true, proposal_id_accepted="+proposal_id+"  WHERE id  IN ("+aux_obj_list_filtered+") RETURNING  *  "  ;
+ 
+  console.log("3 -  blockObjects function QUERY : "+query_block_objects);
+ 
+  const res = await client.query(query_block_objects) 
+  client.end() 
+  console.log("1.- accept_proposal "+ JSON.stringify(res.rows) );
+  return res.rows ;
+  
+
+}
+
+
 
 /******************************************************************************************************** */
 /******************************************************************************************************** */
