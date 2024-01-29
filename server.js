@@ -465,6 +465,7 @@ async function saveImageProduct(imageB64, filename  )
    ) RETURNING * 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
+    console.log("SQL INSER PRODUCT :"+query_insert_img );
     const result =  await client.query(query_insert_img)
     
     //IF SUCCESS FOUND USER
