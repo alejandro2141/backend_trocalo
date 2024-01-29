@@ -1437,8 +1437,162 @@ console.log("private_get_comments : "+sql_query);
 
 
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************         GET  ALL COMMENTS                     ***************************************** */
+/****************        08-01-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
 
 
+app.route('/private_get_all_comments')
+.post(function (req, res) {
 
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_all_comments  REQUEST: "+JSON.stringify(req.body))
+//{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
+
+let sql_query = `SELECT * FROM comment   ORDER BY id DESC ; `
+
+console.log("private_get_all_comments : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT private_get_all_comments'+JSON.stringify(result.rows) ) ;
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************       FIX ISSUE                               ***************************************** */
+/****************        08-01-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+
+app.route('/private_fix_comment')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_fix_comment  REQUEST: "+JSON.stringify(req.body))
+//{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
+
+let sql_query = "UPDATE comment SET fixed=true WHERE id="+req.body.id+" returning * "
+
+console.log("private_fix_comment : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT private_fix_comment'+JSON.stringify(result.rows) ) ;
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************       UNFIX ISSUE                               ***************************************** */
+/****************        08-01-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+
+app.route('/private_unfix_comment')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_unfix_comment  REQUEST: "+JSON.stringify(req.body))
+//{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
+
+let sql_query = "UPDATE comment SET fixed=false WHERE id="+req.body.id+" returning * "
+
+console.log("private_unfix_comment : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT private_unfix_comment'+JSON.stringify(result.rows) ) ;
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
 
 
