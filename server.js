@@ -981,7 +981,9 @@ app.route('/private_update_proposal')
 
   let sql_query = `UPDATE proposal SET 
   user_id_destination = ${req.body.proposal_original.user_id_source}  ,
-  user_id_source =  ${req.body.proposal_original.user_id_destination} ,  `
+  user_id_source =  ${req.body.proposal_original.user_id_destination} , 
+  
+  `
 
   if (req.body.destObjects[0] != null)
   { sql_query= sql_query+` source_object1 =  ${req.body.destObjects[0].id} ,` }
@@ -1015,8 +1017,9 @@ app.route('/private_update_proposal')
   { sql_query= sql_query+` dest_object5 =  ${req.body.sourceObjects[4].id} ,` }
   else { sql_query= sql_query+` dest_object5 =  null,` }
 
-  sql_query= sql_query+` source_owner_name =  '${req.body.proposal_original.dest_owner_name}' ,
-  dest_owner_name =  '${req.body.proposal_original.source_owner_name}' 
+  sql_query= sql_query+` source_owner_name =  '${req.body.proposal_original.dest_owner_name}'  ,
+  dest_owner_name =  '${req.body.proposal_original.source_owner_name} ' ,  negotiation_loop='${req.body.proposal_original.negotiation_loop + 1}' 
+
   WHERE  id=  ${req.body.proposal_original.id}    ; 
   ` 
 
