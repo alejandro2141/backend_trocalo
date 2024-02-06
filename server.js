@@ -533,6 +533,58 @@ app.route('/public_search_objects')
 
 /******************************************************************************************************** */
 /******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      SEARCH PUBLIC GET OBJECTS  CATEGORY      ***************************************** */
+/****************                    05-02-2024                 ***************************************** */
+/****************                                               ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/public_search_objects_by_category')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/public_search_objects_by_category  REQUEST: "+JSON.stringify(req.body))
+ 
+  let json_response = null ;
+  let timestamp= new Date().getTime();
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) AND ( )  ; 
+  `
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(query_search_object , (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_search_object ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
 /****************                                          ********************************************** */
 /****************      GET MY OBJECTS  28-12-2023               ***************************************** */
 /****************                                          ********************************************** */
