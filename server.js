@@ -503,7 +503,7 @@ app.route('/public_search_objects')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  LIMIT 12 ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -554,7 +554,7 @@ app.route('/public_search_objects_by_category')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) AND ( )  ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) AND (  category1 IN (${req.body.search_categories})  )  LIMIT 6 ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -569,7 +569,7 @@ app.route('/public_search_objects_by_category')
   {
     if (result !=null)
       {
-      console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+      console.log('RESULT public_search_objects_by_category'+JSON.stringify(result.rows) ) ;
       res.status(200).send(JSON.stringify(result.rows) );
       }
       else
