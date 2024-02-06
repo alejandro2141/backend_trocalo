@@ -483,7 +483,7 @@ async function saveImageProduct(imageB64, filename  )
 
 /******************************************************************************************************** */
 /******************************************************************************************************** */
-/****************                                          ********************************************** */
+/****************  reformular para busqueda por parametros ********************************************** */
 /****************      SEARCH PUBLIC OBJECTS     26-12-2023     ***************************************** */
 /****************                                          ********************************************** */
 /******************************************************************************************************** */
@@ -503,7 +503,57 @@ app.route('/public_search_objects')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  LIMIT 12 ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  LIMIT 12  ; 
+  `
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(query_search_object , (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_search_object ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************      SEARCH PUBLIC OBJECTS     26-12-2023     ***************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/public_search_objects_last')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/public_search_objects  REQUEST: "+JSON.stringify(req.body))
+ 
+  let json_response = null ;
+  let timestamp= new Date().getTime();
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) ORDER BY id DESC  LIMIT 9  ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -554,7 +604,8 @@ app.route('/public_search_objects_by_category')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) AND (  category1 IN (${req.body.search_categories})  )  LIMIT 6 ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) 
+  AND ( category1 IN (${req.body.search_categories})  OR category2 IN (${req.body.search_categories}) OR category3 IN (${req.body.search_categories})    )  LIMIT 6 ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
