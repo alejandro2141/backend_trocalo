@@ -305,11 +305,13 @@ app.route('/private_delete_object')
   {
     if (result !=null)
       {
-      console.log('RESULT private_delete_object'+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
+        console.log('RESULT private_delete_object'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -513,18 +515,22 @@ app.route('/public_search_objects')
   {
       console.log(' ERROR QUERY = '+query_search_object ) ;
       console.log(' ERR = '+err ) ;
+      client.end()  
   }
   else 
   {
     if (result !=null)
       {
       console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+      client.end()  
       res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
+
   }
 
   })
@@ -619,16 +625,19 @@ app.route('/public_search_objects_last')
   {
       console.log(' ERROR QUERY = '+query_search_object ) ;
       console.log(' ERR = '+err ) ;
+      client.end()  
   }
   else 
   {
     if (result !=null)
       {
-      console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
+        console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -676,11 +685,13 @@ app.route('/public_search_objects_by_category')
   {
     if (result !=null)
       {
-      console.log('RESULT public_search_objects_by_category'+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
+        console.log('RESULT public_search_objects_by_category'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -725,16 +736,19 @@ let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id}' AND  (del
   {
       console.log(' ERROR QUERY = '+query ) ;
       console.log(' ERR = '+err ) ;
+      client.end()  
   }
   else 
   {
     if (result !=null)
       {
-      console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
+        console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -782,16 +796,19 @@ let query = `SELECT * FROM user_object WHERE owner_id='${req.body.partner_id}' A
   {
       console.log(' ERROR QUERY = '+query ) ;
       console.log(' ERR = '+err ) ;
+      client.end()  
   }
   else 
   {
     if (result !=null)
       {
-      console.log('RESULT private_get_partner_objects'+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
+        console.log('RESULT private_get_partner_objects'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -844,11 +861,13 @@ app.route('/private_get_proposals_received')
   {
     if (result !=null)
       {
-      console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
+        console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -889,17 +908,19 @@ app.route('/private_get_proposals_sent')
   {
       console.log(' ERROR QUERY = '+query_get_proposals ) ;
       console.log(' ERR = '+err ) ;
+      client.end()  
   }
   else 
   {
     if (result !=null)
       {
-      console.log('RESULT private_get_proposals_sent'+JSON.stringify(result.rows) ) ;
-      res.status(200).send(JSON.stringify(result.rows) );
-
+        console.log('RESULT private_get_proposals_sent'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -943,16 +964,19 @@ app.route('/cancel_proposal')
   {
       console.log(' ERROR QUERY = '+query_get_proposals ) ;
       console.log(' ERR = '+err ) ;
+      client.end()  
   }
   else 
   {
     if (result !=null)
       {
       console.log('RESULT private_cancel_proposal'+JSON.stringify(result) ) ;
+      client.end()  
       res.status(200).send(JSON.stringify(result) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -1090,16 +1114,19 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
     {
         console.log(' ERROR QUERY = '+sql_query ) ;
         console.log(' ERR = '+err ) ;
+        client.end()  
     }
     else 
     {
       if (result !=null)
         {
-        console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
-        res.status(200).send(JSON.stringify(result.rows) );
+          console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
         }
         else
         {
+          client.end()  
           res.status(200).send( null ) ;
         }
     }
@@ -1229,16 +1256,19 @@ console.log("SQL UPDATE PROPOSAL:"+sql_query);
     {
         console.log(' ERROR QUERY = '+sql_query ) ;
         console.log(' ERR = '+err ) ;
+        client.end()  
     }
     else 
     {
       if (result !=null)
         {
-        console.log('RESULT private_update_proposal'+JSON.stringify(result.rows) ) ;
-        res.status(200).send(JSON.stringify(result.rows) );
+          console.log('RESULT private_update_proposal'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
         }
         else
         {
+          client.end()  
           res.status(200).send( null ) ;
         }
     }
@@ -1288,16 +1318,19 @@ app.route('/private_get_objects')
   {
       console.log(' ERROR QUERY = '+query_get_proposals ) ;
       console.log(' ERR = '+err ) ;
+      client.end()  
   }
   else 
   {
     if (result !=null)
       {
       console.log('RESULT private_get_objects'+JSON.stringify(result.rows) ) ;
+      client.end()  
       res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -1448,6 +1481,7 @@ app.route('/private_proposal_cancel')
   if (err) 
   {
       console.log(' ERROR QUERY = '+query_get_proposals ) ;
+      client.end()  
       console.log(' ERR = '+err ) ;
   }
   else 
@@ -1455,10 +1489,12 @@ app.route('/private_proposal_cancel')
     if (result !=null)
       {
       console.log('RESULT private_proposal_cancel '+JSON.stringify(result.rows) ) ;
+      client.end()  
       res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
+        client.end()  
         res.status(200).send( null ) ;
       }
   }
@@ -1520,16 +1556,19 @@ console.log("  SQL INSERT Comment : "+sql_query);
     {
         console.log(' ERROR QUERY = '+sql_query ) ;
         console.log(' ERR = '+err ) ;
+        client.end()  
     }
     else 
     {
       if (result !=null)
         {
         console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
+        client.end()  
         res.status(200).send(JSON.stringify(result.rows) );
         }
         else
         {
+          client.end()  
           res.status(200).send( null ) ;
         }
     }
@@ -1576,16 +1615,19 @@ console.log("private_get_comments : "+sql_query);
     {
         console.log(' ERROR QUERY = '+sql_query ) ;
         console.log(' ERR = '+err ) ;
+        client.end()  
     }
     else 
     {
       if (result !=null)
         {
         console.log('RESULT private_get_comments'+JSON.stringify(result.rows) ) ;
+        client.end()  
         res.status(200).send(JSON.stringify(result.rows) );
         }
         else
         {
+          client.end()  
           res.status(200).send( null ) ;
         }
     }
@@ -1631,16 +1673,19 @@ console.log("private_get_all_comments : "+sql_query);
     {
         console.log(' ERROR QUERY = '+sql_query ) ;
         console.log(' ERR = '+err ) ;
+        client.end()  
     }
     else 
     {
       if (result !=null)
         {
-        console.log('RESULT private_get_all_comments'+JSON.stringify(result.rows) ) ;
-        res.status(200).send(JSON.stringify(result.rows) );
+          console.log('RESULT private_get_all_comments'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
         }
         else
         {
+          client.end()  
           res.status(200).send( null ) ;
         }
     }
@@ -1684,16 +1729,19 @@ console.log("private_fix_comment : "+sql_query);
     {
         console.log(' ERROR QUERY = '+sql_query ) ;
         console.log(' ERR = '+err ) ;
+        client.end()  
     }
     else 
     {
       if (result !=null)
         {
-        console.log('RESULT private_fix_comment'+JSON.stringify(result.rows) ) ;
-        res.status(200).send(JSON.stringify(result.rows) );
+          console.log('RESULT private_fix_comment'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
         }
         else
         {
+          client.end()  
           res.status(200).send( null ) ;
         }
     }
@@ -1737,16 +1785,19 @@ console.log("private_unfix_comment : "+sql_query);
     {
         console.log(' ERROR QUERY = '+sql_query ) ;
         console.log(' ERR = '+err ) ;
+        client.end()  
     }
     else 
     {
       if (result !=null)
         {
-        console.log('RESULT private_unfix_comment'+JSON.stringify(result.rows) ) ;
-        res.status(200).send(JSON.stringify(result.rows) );
+          console.log('RESULT private_unfix_comment'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
         }
         else
         {
+          client.end()  
           res.status(200).send( null ) ;
         }
     }
