@@ -84,11 +84,17 @@ async function public_login_user(req)
   let user_data = await login_user(req)
   console.log ("PUBLIC LOGIN USER: user_data:"+JSON.stringify(user_data))
   //    CREATE SESION
+  if (user_data != null)
+  {
   let user_data_session = await create_session(user_data)
   console.log ("PUBLIC LOGIN USER: user_data_session:"+ JSON.stringify(user_data_session))
   //return concat
    return ( { ...user_data_session, ...user_data } )
-
+  }
+  else 
+  {
+    return (null)
+  }
 }
 
 //*************************** */
@@ -1026,7 +1032,7 @@ app.route('/save_proposal')
   sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
 
   sql_columns     = sql_columns.concat( ",user_id_destination" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].owner_id ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted.owner_id ) 
 
   sql_columns     = sql_columns.concat( ",amount" ) 
   sql_columns_val = sql_columns_val.concat( ",17990 " ) 
@@ -1041,7 +1047,7 @@ app.route('/save_proposal')
   sql_columns_val = sql_columns_val.concat( ","+req.body.session_data.id ) 
 
   sql_columns     = sql_columns.concat( ",dest_object1" ) 
-  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted[0].id ) 
+  sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted.id ) 
 
   sql_columns     = sql_columns.concat( ",source_object1" ) 
   sql_columns_val = sql_columns_val.concat( ","+req.body.objects_offered[0].id ) 
@@ -1076,10 +1082,10 @@ app.route('/save_proposal')
   sql_columns_val = sql_columns_val.concat( ",'"+req.body.session_data.name+"'" ) 
   }
   // set Dest Owner Name
-  if ( req.body.object_wanted[0].owner_name  !=null  )
+  if ( req.body.object_wanted.owner_name  !=null  )
   {
   sql_columns     = sql_columns.concat( ",dest_owner_name" ) 
-  sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].owner_name+"'" ) 
+  sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted.owner_name+"'" ) 
   }
   // set source Owner Name
   if ( req.body.objects_offered[0].owner_name  !=null )
@@ -1097,10 +1103,10 @@ app.route('/save_proposal')
   
 
 // set Propposal Title
-if ( req.body.object_wanted[0].title  !=null  )
+if ( req.body.object_wanted.title  !=null  )
 {
 sql_columns     = sql_columns.concat( ",title" ) 
-sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted[0].title+"'" ) 
+sql_columns_val = sql_columns_val.concat( ",'"+req.body.object_wanted.title+"'" ) 
 }
 
 
