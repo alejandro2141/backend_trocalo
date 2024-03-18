@@ -1035,7 +1035,7 @@ app.route('/save_proposal')
   sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted.owner_id ) 
 
   sql_columns     = sql_columns.concat( ",amount" ) 
-  sql_columns_val = sql_columns_val.concat( ",17990 " ) 
+  sql_columns_val = sql_columns_val.concat( ",10000 " ) 
 
   sql_columns     = sql_columns.concat( ",status" ) 
   sql_columns_val = sql_columns_val.concat( ",1" ) 
@@ -1405,7 +1405,7 @@ async function accept_proposal(proposal_id)
   const client = new Client(conn_data)
   await client.connect() 
    
-  let query_get_proposals = "UPDATE proposal SET status=100 WHERE id='"+proposal_id+"' RETURNING  source_object1,source_object2,source_object3,source_object4,source_object5 ,  dest_object1, dest_object2, dest_object3, dest_object4, dest_object5    "  ;
+  let query_get_proposals = "UPDATE proposal SET  date_acceptance=NOW() ,  status=100 WHERE id='"+proposal_id+"' RETURNING  source_object1,source_object2,source_object3,source_object4,source_object5 ,  dest_object1, dest_object2, dest_object3, dest_object4, dest_object5    "  ;
   
   const res = await client.query(query_get_proposals) 
   client.end() 
