@@ -1473,7 +1473,7 @@ app.route('/private_proposal_cancel')
   
   console.log("/private_proposal_cancel  REQUEST: "+JSON.stringify(req.body))
  
-  let query_get_proposals = "UPDATE proposal SET status=200 WHERE id='"+req.body.proposal_id+"' "  ;
+  let query_get_proposals = "UPDATE proposal SET status=300 WHERE id='"+req.body.proposal_id+"' "  ;
 
   /*
   UPDATE table_name
