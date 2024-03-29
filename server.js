@@ -898,6 +898,47 @@ app.route('/private_get_proposals_received')
 app.route('/private_get_proposals_sent')
 .post(function (req, res) {
 
+  console.log("/private_get_proposals_sent REQUEST: "+JSON.stringify(req.body))
+
+  private_get_proposals_sent(req).then(result => {console.log("returning:"+JSON.stringify(result) ) ; res.status(200).send(JSON.stringify(result) ); }   )
+  
+})
+
+
+async function private_get_proposals_sent(req)
+{
+  
+  let json_response = {}
+  //1st get proposals list sent
+  let resp = await get_proposals_sent(req)
+ 
+  json_response.proposals = resp.rows 
+  json_response.lala = "lalala" 
+  
+  return json_response  
+
+}
+
+
+async function get_proposals_sent(request_received)
+{
+
+  //console.log("function get_proposals_sent :"+JSON.stringify(request_received))
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  await client.connect() 
+   
+  let query_get_proposals = "SELECT * FROM  proposal WHERE user_id_source="+request_received.body.id  ;
+
+  const res = await client.query(query_get_proposals) 
+  client.end() 
+  return (res)
+  
+  //console.log("1.- accept_proposal "+ JSON.stringify(res.rows[0]) );
+
+
+  /*
   const { Client } = require('pg')
   const client = new Client(conn_data)
   client.connect() 
@@ -908,7 +949,7 @@ app.route('/private_get_proposals_sent')
 
  // console.log("QUERY Insert User  :"+query_insert_img);
      
- const resultQuery= client.query(query_get_proposals, (err, result) => {
+ const resultQuery= await client.query(query_get_proposals, (err, result) => {
 
   if (err) 
   {
@@ -921,22 +962,29 @@ app.route('/private_get_proposals_sent')
     if (result !=null)
       {
         console.log('RESULT private_get_proposals_sent'+JSON.stringify(result.rows) ) ;
-        client.end()  
-        res.status(200).send(JSON.stringify(result.rows) );
+        client.end()
+        //res.status(200).send(JSON.stringify(result.rows) );
+        return result.rows
       }
       else
       {
         client.end()  
-        res.status(200).send( null ) ;
+        //res.status(200).send( null ) ;
+        return null 
       }
   }
 
   client.end()
 
   })
+*/
 
-  
-})
+}
+
+async function private_get_product_images(req)
+{
+}
+
 
 
 /******************************************************************************************************** */
