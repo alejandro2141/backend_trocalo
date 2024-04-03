@@ -912,11 +912,15 @@ async function private_get_proposals_sent(req)
   //1st get proposals list sent
   let resp = await get_proposals_sent(req)
  
+  //make an array include just proposals ids
+  let objects_ids=resp.rows.map(proposal => proposal.dest_object1 ) ;
+
+  let objects= await private_get_product_images(objects_ids)
+
   json_response.proposals = resp.rows 
-  json_response.lala = "lalala" 
+  json_response.objects = objects.rows
   
   return json_response  
-
 }
 
 
@@ -935,54 +939,24 @@ async function get_proposals_sent(request_received)
   client.end() 
   return (res)
   
-  //console.log("1.- accept_proposal "+ JSON.stringify(res.rows[0]) );
 
-
-  /*
-  const { Client } = require('pg')
-  const client = new Client(conn_data)
-  client.connect() 
-  
-  console.log("/private_get_proposals_sent REQUEST: "+JSON.stringify(req.body))
- 
-  let query_get_proposals = "SELECT * FROM  proposal WHERE user_id_source="+req.body.id  ;
-
- // console.log("QUERY Insert User  :"+query_insert_img);
-     
- const resultQuery= await client.query(query_get_proposals, (err, result) => {
-
-  if (err) 
-  {
-      console.log(' ERROR QUERY = '+query_get_proposals ) ;
-      console.log(' ERR = '+err ) ;
-      client.end()  
-  }
-  else 
-  {
-    if (result !=null)
-      {
-        console.log('RESULT private_get_proposals_sent'+JSON.stringify(result.rows) ) ;
-        client.end()
-        //res.status(200).send(JSON.stringify(result.rows) );
-        return result.rows
-      }
-      else
-      {
-        client.end()  
-        //res.status(200).send( null ) ;
-        return null 
-      }
-  }
-
-  client.end()
-
-  })
-*/
 
 }
 
-async function private_get_product_images(req)
+async function private_get_product_images(prop_ids)
 {
+  console.log("objects ids: "+prop_ids)
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  await client.connect() 
+   
+  let query_get_proposals = "SELECT * FROM  user_object WHERE id  IN ("+prop_ids+") "  ;
+
+  const res = await client.query(query_get_proposals) 
+  client.end() 
+  return (res)
+
 }
 
 
