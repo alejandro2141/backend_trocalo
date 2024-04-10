@@ -910,8 +910,11 @@ async function private_get_proposals_sent(req)
   
   let json_response = {}
   //1st get proposals list sent
+
   let resp = await get_proposals_sent(req)
- 
+  if (resp!=null && resp.rows !=null && resp.rows.length >0  )
+  {
+
   //make an array include just proposals ids
   let objects_ids=resp.rows.map(proposal => proposal.dest_object1 ) ;
 
@@ -921,6 +924,13 @@ async function private_get_proposals_sent(req)
   json_response.objects = objects.rows
   
   return json_response  
+
+  }
+  else 
+  {
+    return null
+  }
+
 }
 
 
