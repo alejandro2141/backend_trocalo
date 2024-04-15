@@ -4,8 +4,7 @@ npm version: 9.3.1
 
 
 Install a  node specific  version:
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh
-
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
 
 git clone https://github.com/alejandro2141/trocalo.git
