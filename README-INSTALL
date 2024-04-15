@@ -1,0 +1,13 @@
+Software Requirements 
+node version: v18.14.0
+npm version: 9.3.1
+
+
+Install a  node specific  version:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh
+
+
+
+git clone https://github.com/alejandro2141/trocalo.git
+
+
