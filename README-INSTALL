@@ -10,3 +10,13 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 git clone https://github.com/alejandro2141/trocalo.git
 
 
+sudo su postgres
+createdb trocalodb
+createuser -e trocalo_user
+
+
+
+ user: 'trocalo_user',
+  host: '127.0.0.1',
+  database: 'trocalodb',
+  password: 'trocalo_pass',
