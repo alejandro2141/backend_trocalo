@@ -12,6 +12,7 @@ const HOST = '0.0.0.0';
 const PATH_PROD_IMG = '../trocalo/public/productImages/'
 // path Prod
 // const PATH_PROD_IMG = '/productImages/'
+//const PATH_PROD_IMG = '/var/www/html/public/productImages/'
 
 
 // App
