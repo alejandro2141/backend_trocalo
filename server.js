@@ -746,7 +746,7 @@ let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id}' AND  (del
   }
   else 
   {
-    if (result !=null)
+    if (result !=null && result.rows!=null  && result.rows.length>0 )
       {
         console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
         client.end()  
@@ -865,7 +865,7 @@ app.route('/private_get_proposals_received')
   }
   else 
   {
-    if (result !=null)
+    if (result !=null  && result.rows!=null   && result.rows.length>0 )
       {
         console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
         client.end()  
@@ -1156,7 +1156,7 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
     }
     else 
     {
-      if (result !=null)
+      if (result !=null  && result.rows!=null  && result.rows.length>0  )
         {
           console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
           client.end()  
@@ -1598,7 +1598,7 @@ console.log("  SQL INSERT Comment : "+sql_query);
     }
     else 
     {
-      if (result !=null)
+      if (result !=null  && result.rows!=null && result.rows.length>0  )
         {
         console.log('RESULT private_get_my_objects'+JSON.stringify(result.rows) ) ;
         client.end()  
