@@ -405,10 +405,13 @@ async function user_create_product(req)
   //      CREATE IMAGES 
   //*************************** */
 
-  if (req.body.image1 !=null )
+  if (req.body.image1 !=null && req.body.image1_thumb !=null)
   {
     let auxBase64=req.body.image1.split(",")
     saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref1 ) 
+    //save thumb image
+    let auxBase64_thumb=req.body.image1_thumb.split(",")
+    saveImageProduct( auxBase64_thumb[1] , responseQuery.rows[0].img_ref1+"_thumb" ) 
   }
   if (req.body.image2 !=null )
   {
