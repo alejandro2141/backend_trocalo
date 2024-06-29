@@ -417,21 +417,33 @@ async function user_create_product(req)
   {
     let auxBase64=req.body.image2.split(",")
     saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref2 ) 
+    //save thumb image
+    let auxBase64_thumb=req.body.image2_thumb.split(",")
+    saveImageProduct( auxBase64_thumb[1] , responseQuery.rows[0].img_ref2+"_thumb" )
   }
   if (req.body.image3 !=null )
   {
     let auxBase64=req.body.image3.split(",")
     saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref3 ) 
+    //save thumb image
+    let auxBase64_thumb=req.body.image3_thumb.split(",")
+    saveImageProduct( auxBase64_thumb[1] , responseQuery.rows[0].img_ref3+"_thumb" )
   }
   if (req.body.image4 !=null )
   {
     let auxBase64=req.body.image4.split(",")
     saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref4 ) 
+    //save thumb image
+    let auxBase64_thumb=req.body.image4_thumb.split(",")
+    saveImageProduct( auxBase64_thumb[1] , responseQuery.rows[0].img_ref4+"_thumb" )
   }
   if (req.body.image5 !=null )
   {
     let auxBase64=req.body.image5.split(",")
     saveImageProduct( auxBase64[1] , responseQuery.rows[0].img_ref5 ) 
+    //save thumb image
+    let auxBase64_thumb=req.body.image5_thumb.split(",")
+    saveImageProduct( auxBase64_thumb[1] , responseQuery.rows[0].img_ref5+"_thumb" )
   }
 
 }
