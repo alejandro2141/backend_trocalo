@@ -4,6 +4,17 @@ npm version: 9.3.1
 
 
 Install a  node specific  version:
+1.- ping repository
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh
+2.- Once ping success, we can install
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+Install nvm
+source ~/.bashrc
+nvm list-remote
+nvm install v18.14.0
+
+
+
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 
 
