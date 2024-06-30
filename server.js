@@ -137,11 +137,14 @@ async function create_session(userData)
   client.connect() 
 
   let token=await create_token(userData)
+
+  let cdate= new Date()
+  let expDate = new Date(cdate.getTime() + 86400000)
   
   let query_insert_session_data = `INSERT INTO session 
   (creation_date ,  user_id , user_name , exp_date , token , token_exp_date , last_login) 
   VALUES  
-  ('${new Date().toISOString() }' , '${userData.id}' , '${userData.names}' , '${new Date().toISOString()}' , '${token}' ,'${new Date().toISOString()}' , '${new Date().toISOString()}' ) 
+  ('${cdate.toISOString() }' , '${userData.id}' , '${userData.names}' , '${expDate.toISOString()}' , '${token}' ,'${expDate.toISOString()}' , '${cdate.toISOString()}' ) 
   RETURNING * 
   `
   const result = await client.query(query_insert_session_data) 
@@ -169,14 +172,47 @@ async function create_token(userData)
 
   return  token
 */
-return "111234token3234"
+//let cdate=new Date()
+return ("T_"+new Date().getTime()+"_"+userData.id)
 }
 
 //**************************** */
 // ****  VALIDATE TOKEN       ****/
 //**************************** */
-async function validate_token(token)
+async function is_valid_token_session(session)
 { 
+  console.log("validateToken : "+JSON.stringify(session))
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+
+  //GET SESSION DATA FROM DB
+  
+  let query_get_session = `SELECT * FROM session WHERE token = '${session.token}'  `
+  console.log("SQL GET SESSION :"+query_get_session );
+  const result =  await client.query(query_get_session)
+  client.end()
+  
+  console.log("RESULT GET SESSION DATA BY TOKEN : "+JSON.stringify(result.rows))
+
+  //1st verify token exp date 
+  let cdate = new Date() 
+  let expDate = new Date( result.rows[0].token_exp_date ) 
+
+  if (cdate.getTime() > expDate.getTime())
+    {
+      console.log("SESION TOKEN EXPIRADO")
+      console.log("cdate:"+cdate.toISOString() +"    expDate:"+expDate.toISOString() )
+      return false 
+    }
+  else 
+  {
+    console.log("SESION TOKEN OK")
+    console.log("cdate:"+cdate.toISOString() +"    expDate:"+expDate.toISOString() )
+    return true 
+  }
+
 /*
   let aux = token.split("-")
   
@@ -186,8 +222,17 @@ async function validate_token(token)
 
   return  token
   */
+ /*
+  if (token == session.token)
+    {
+      return 1    
+    }
+  else 
+  {
+    return 0
+  }
+  */
 
-  return 1
 }
 
 
@@ -288,6 +333,27 @@ const resultado2 = client2.query(query_insert_user, (err, result) => {
 
 app.route('/private_delete_object')
 .post(function (req, res) {
+
+
+ //validate Session
+is_valid_token_session(req.body.session_data).then(  
+  function (e) {
+     
+    if (! e )  { 
+      let json_response = {response_code:700}
+      res.status(200).send( JSON.stringify(json_response)  ) 
+      console.log("SESION token expired "+e)
+    }
+   else 
+   {
+      console.log("SESION OK "+e)
+   }
+
+    }
+
+)
+
+ //***
 
   console.log("/private_delete_object REQUEST: "+JSON.stringify(req.body))
     
