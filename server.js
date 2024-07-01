@@ -18,6 +18,7 @@ const PATH_PROD_IMG = '../trocalo/public/productImages/'
 // App
 const app = express();
 
+
 // APP SET CORS to allow Al Origins
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -37,6 +38,102 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(express.json({limit: '25mb'}));
 app.use(express.urlencoded({ extended: true , limit: '25mb'}));
+
+
+//******************************************************************************************************* */
+//************************   MIDDLEWARE INTERCEPTOR FOR VALIDATION   ************************************ */
+//******************************************************************************************************* */
+app.use(function(req, res, next) {
+  //console.log("INFO: interceptor Middleware REQUEST "+JSON.stringify(req.body) )
+
+  const exceptionOnValidation = [
+    '/public_search_objects_last',
+    '/public_search_objects_by_category', 
+    '/public_login_user',
+    '/public_register_user',
+    '/private_get_all_comments'
+  ]
+  
+  if ( req.method == "POST" && !exceptionOnValidation.includes(req.url) )
+    {
+      console.log("INFO : REQ.URL :"+req.method,req.url+" REQUIRE SESSION_DATA VALIDATION")
+
+      is_valid_token_session(req.body.session_data).then(  
+        function (e) {
+           
+          if (! e )  { 
+            let json_response = {response_code:700}
+            res.status(200).send( JSON.stringify(json_response)  ) 
+            console.log("SESION token expired "+e)
+          }
+         else 
+         {
+            console.log("SESION OK "+e)
+            next()
+         }
+      
+          }
+      
+      )
+
+
+      /*
+
+      if (req.body != null && req.body!=null && req.body.session_data != null )
+        {
+
+
+              if (is_valid_token_session(req.body.session_data))
+              { 
+                console.log("---- si valid token "+is_valid_token_session(req.body.session_data))
+                console.log("REQ.URL :"+req.method,req.url+" ACCESS VALID") 
+                next()
+              }
+              else 
+              {
+                  console.log("ERROR : REQ.URL :"+req.method,req.url+" VALIDATION FAILED SESSION DATA  "+JSON.stringify(req.body)) 
+              }
+
+        }
+        else 
+        {
+          console.log("ERROR : REQ.URL :"+req.method,req.url+" DOES NOT INCLUDE SESSION_DATA")
+        }
+        */
+
+    }
+  else 
+  {
+    console.log("REQ.URL :"+req.method,req.url+" DOES NOT REQUIRE SESSION VALIDATION")
+    next()
+  }
+
+
+/*
+  if ( req.method == "POST" && req.url == "/private_delete_object")
+    {
+      console.log("INFO : REQ.URL :"+req.method,req.url+" REQUIRE SESSION_DATA VALIDATION")
+      let validation=is_valid_token_session(req.body.session_data)
+        if (validation)
+        { 
+          console.log("REQ.URL :"+req.method,req.url+" ACCESS VALID") 
+          next()
+        }
+        else 
+        {
+            console.log("ERROR : REQ.URL :"+req.method,req.url+" VALIDATION FAILED SESSION DATA  "+JSON.stringify(req.body)) 
+        }
+    }
+  else 
+  {
+    console.log("REQ.URL :"+req.method,req.url+" DOES NOT REQUIRE SESSION VALIDATION")
+    next()
+  } 
+*/
+
+});
+
+
 
 //************************************************************************************************************/
 //************************************************************************************************************/
@@ -204,13 +301,13 @@ async function is_valid_token_session(session)
     {
       console.log("SESION TOKEN EXPIRADO")
       console.log("cdate:"+cdate.toISOString() +"    expDate:"+expDate.toISOString() )
-      return false 
+      return (false) 
     }
   else 
   {
     console.log("SESION TOKEN OK")
     console.log("cdate:"+cdate.toISOString() +"    expDate:"+expDate.toISOString() )
-    return true 
+    return (true) 
   }
 
 /*
@@ -331,11 +428,14 @@ const resultado2 = client2.query(query_insert_user, (err, result) => {
 // 
 /******************************************************************************************************** */
 
+
+
 app.route('/private_delete_object')
 .post(function (req, res) {
 
 
  //validate Session
+ /*
 is_valid_token_session(req.body.session_data).then(  
   function (e) {
      
@@ -352,7 +452,7 @@ is_valid_token_session(req.body.session_data).then(
     }
 
 )
-
+*/
  //***
 
   console.log("/private_delete_object REQUEST: "+JSON.stringify(req.body))
@@ -814,7 +914,7 @@ app.route('/private_get_my_objects')
 //  let query = `SELECT * FROM  user_object WHERE owner_id='${req.body.id}   ';   `
 //let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id} AND  (deleted_by_owner != TRUE OR  deleted_by_owner IS  NULL )  ';   `
 // AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )
-let query = `SELECT * FROM user_object WHERE owner_id='${req.body.id}' AND  (deleted_by_owner = FALSE OR  deleted_by_owner IS  NULL )   ;`
+let query = `SELECT * FROM user_object WHERE owner_id='${req.body.session_data.id}' AND  (deleted_by_owner = FALSE OR  deleted_by_owner IS  NULL )   ;`
 
 // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -933,7 +1033,7 @@ app.route('/private_get_proposals_received')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query = `SELECT * FROM  proposal WHERE user_id_destination='${req.body.id}'; 
+  let query = `SELECT * FROM  proposal WHERE user_id_destination='${req.body.session_data.id}'; 
   `
 
  // console.log("QUERY Insert User  :"+query_insert_img);
@@ -1025,7 +1125,7 @@ async function get_proposals_sent(request_received)
   const client = new Client(conn_data)
   await client.connect() 
    
-  let query_get_proposals = "SELECT * FROM  proposal WHERE user_id_source="+request_received.body.id  ;
+  let query_get_proposals = "SELECT * FROM  proposal WHERE user_id_source="+request_received.body.session_data.id  ;
 
   const res = await client.query(query_get_proposals) 
   client.end() 
