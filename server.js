@@ -44,14 +44,15 @@ app.use(express.urlencoded({ extended: true , limit: '25mb'}));
 //************************   MIDDLEWARE INTERCEPTOR FOR VALIDATION   ************************************ */
 //******************************************************************************************************* */
 app.use(function(req, res, next) {
-  //console.log("INFO: interceptor Middleware REQUEST "+JSON.stringify(req.body) )
 
   const exceptionOnValidation = [
     '/public_search_objects_last',
     '/public_search_objects_by_category', 
     '/public_login_user',
     '/public_register_user',
-    '/private_get_all_comments'
+    '/private_get_all_comments',
+    '/private_fix_comment',
+    '/public_search_objects_by_text'
   ]
   
   if ( req.method == "POST" && !exceptionOnValidation.includes(req.url) )
@@ -62,8 +63,8 @@ app.use(function(req, res, next) {
         function (e) {
            
           if (! e )  { 
-            let json_response = {response_code:700}
-            res.status(200).send( JSON.stringify(json_response)  ) 
+            let json_response = {response:"Session Token Expired"}
+            res.status(401).send( JSON.stringify(json_response)  ) 
             console.log("SESION token expired "+e)
           }
          else 
@@ -73,63 +74,13 @@ app.use(function(req, res, next) {
          }
       
           }
-      
       )
-
-
-      /*
-
-      if (req.body != null && req.body!=null && req.body.session_data != null )
-        {
-
-
-              if (is_valid_token_session(req.body.session_data))
-              { 
-                console.log("---- si valid token "+is_valid_token_session(req.body.session_data))
-                console.log("REQ.URL :"+req.method,req.url+" ACCESS VALID") 
-                next()
-              }
-              else 
-              {
-                  console.log("ERROR : REQ.URL :"+req.method,req.url+" VALIDATION FAILED SESSION DATA  "+JSON.stringify(req.body)) 
-              }
-
-        }
-        else 
-        {
-          console.log("ERROR : REQ.URL :"+req.method,req.url+" DOES NOT INCLUDE SESSION_DATA")
-        }
-        */
-
     }
   else 
   {
     console.log("REQ.URL :"+req.method,req.url+" DOES NOT REQUIRE SESSION VALIDATION")
     next()
   }
-
-
-/*
-  if ( req.method == "POST" && req.url == "/private_delete_object")
-    {
-      console.log("INFO : REQ.URL :"+req.method,req.url+" REQUIRE SESSION_DATA VALIDATION")
-      let validation=is_valid_token_session(req.body.session_data)
-        if (validation)
-        { 
-          console.log("REQ.URL :"+req.method,req.url+" ACCESS VALID") 
-          next()
-        }
-        else 
-        {
-            console.log("ERROR : REQ.URL :"+req.method,req.url+" VALIDATION FAILED SESSION DATA  "+JSON.stringify(req.body)) 
-        }
-    }
-  else 
-  {
-    console.log("REQ.URL :"+req.method,req.url+" DOES NOT REQUIRE SESSION VALIDATION")
-    next()
-  } 
-*/
 
 });
 
@@ -286,29 +237,38 @@ async function is_valid_token_session(session)
 
   //GET SESSION DATA FROM DB
   
-  let query_get_session = `SELECT * FROM session WHERE token = '${session.token}'  `
+  let query_get_session = `SELECT * FROM session WHERE user_id='${session.id}' order by id desc limit 1 `
   console.log("SQL GET SESSION :"+query_get_session );
   const result =  await client.query(query_get_session)
   client.end()
   
   console.log("RESULT GET SESSION DATA BY TOKEN : "+JSON.stringify(result.rows))
 
-  //1st verify token exp date 
+// 1.- Check if LAST Token exist in DB for this user is the token provided. 
+  if (result.rows[0].token == session.token )
+  { console.log("SESSION TOKEN Validation for UserId:"+session.id+" "+session.token+"  OK " ) }
+  else 
+  {
+    console.log("ERROR SESSION It is an Old TOKEN   for UserId:"+session.id+" NEW Sesion was created by other login  " )
+    return false
+  }
+
+// 2.- check token expiration date 
   let cdate = new Date() 
   let expDate = new Date( result.rows[0].token_exp_date ) 
 
   if (cdate.getTime() > expDate.getTime())
     {
-      console.log("SESION TOKEN EXPIRADO")
-      console.log("cdate:"+cdate.toISOString() +"    expDate:"+expDate.toISOString() )
+      console.log("SESSION TOKEN EXPIRATED Validation for UserId:"+session.id+" "+session.token+"  cdate:"+cdate.toISOString() +" > expDate:"+expDate.toISOString() )
       return (false) 
     }
   else 
   {
-    console.log("SESION TOKEN OK")
-    console.log("cdate:"+cdate.toISOString() +"    expDate:"+expDate.toISOString() )
+    console.log("SESION TOKEN EXP DATE OK UserId:"+session.id+" "+session.token+" ")
     return (true) 
   }
+
+
 
 /*
   let aux = token.split("-")
