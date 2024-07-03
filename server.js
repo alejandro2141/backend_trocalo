@@ -156,7 +156,7 @@ async function login_user(req)
   client.connect() 
 
   let query_login = ` SELECT id, 
-  names, last_name1, last_name2, email, phone, address_street_name, address_street_apartment, address_location_zone, address_street_number, address_reference, status, active, id_number    
+  names, last_name1, last_name2, email, phone, address_street_name, address_street_apartment, address_location_zone, address_street_number, address_reference, status, active, id_number , invitations   
   FROM user_created 
   WHERE 
   email='${req.body.user}' AND passwd='${req.body.pass}' ; 
@@ -1802,6 +1802,78 @@ console.log("private_get_comments : "+sql_query);
       if (result !=null)
         {
         console.log('RESULT private_get_comments'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          client.end()  
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+
+
+
+
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE SEND INVITATION                  ***************************************** */
+/****************        08-01-2023                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+
+app.route('/private_send_invitation')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_send_invitation  REQUEST: "+JSON.stringify(req.body))
+//{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
+
+/*
+let sql_query = `INSERT INTO invitation (email,status,user_id,timestamp,sent) VALUES 
+( '${req.body.email}'  , 100 , ${req.body.session_data.id}, NOW(), false  ) RETURNING * `
+*/
+let sql_query = `
+UPDATE user_created SET invitations = (invitations - 1)  WHERE id=${req.body.session_data.id}  returning invitations ;
+INSERT INTO invitation (email,status,user_id,timestamp,sent) VALUES 
+( '${req.body.email}' , 100 , ${req.body.session_data.id} , NOW(), false  ) RETURNING *
+`
+
+
+
+console.log("/private_send_invitation : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log('/private_send_invitation ERROR QUERY = '+sql_query ) ;
+        console.log('/private_send_invitation ERR = '+err ) ;
+        client.end()  
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT /private_send_invitation'+JSON.stringify(result.rows) ) ;
         client.end()  
         res.status(200).send(JSON.stringify(result.rows) );
         }
