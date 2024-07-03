@@ -45,6 +45,8 @@ app.use(express.urlencoded({ extended: true , limit: '25mb'}));
 //******************************************************************************************************* */
 app.use(function(req, res, next) {
 
+  req.body=sntz_json(req.body," Interceptor ")
+
   const exceptionOnValidation = [
     '/public_search_objects_last',
     '/public_search_objects_by_category', 
@@ -2061,3 +2063,76 @@ console.log("private_unfix_comment : "+sql_query);
 })
 
 
+// ************************************************************************************************************
+// ************************************************************************************************************  
+// ***********        SECURITY          ***********************************************************************
+// ***********       02-07-2024         ***********************************************************************
+// ************************************************************************************************************
+// ************************************************************************************************************
+
+// ***************************************************************
+//  TEXT Santizator
+//  validated    02-07-2024
+// ***************************************************************
+function sntz(inputdata , flaw )
+{
+
+if (inputdata != null && typeof inputdata === "string" )
+{
+    const regular_exp= /[^a-z0-9' '\-_@.,:á-ú#]/ig;
+    
+    if (  regular_exp.test(inputdata))
+    {
+      console.log ("WARNIGN WARNING WARNIGN SECURITY WARNING: INPUT includes special characters:"+JSON.stringify(inputdata) )    
+    }
+    //console.log("sanitizing:"+inputdata)
+    //here show error in devel AWS
+    return inputdata.replace( regular_exp, "" );
+}  
+else 
+{
+  return null;
+} 
+
+
+
+}
+
+// ***************************************************************
+//  JSON Santizator
+//  validated    24-03-2023
+// ***************************************************************
+
+function sntz_json(json_input,service_name)
+{ 
+// console.log("sanitization JSON INPUT: "+JSON.stringify(json_input))
+const keys = Object.keys(json_input);
+for (let i = 0; i < keys.length; i++) {
+const key = keys[i]; 
+
+if (typeof json_input[key] === 'string' || json_input[key] instanceof String )
+{
+  let exceptions = 
+  [ 'image1',
+    'image1_thumb',
+    'image2',
+    'image2_thumb',
+    'image3',
+    'image3_thumb',
+    'image4',
+    'image4_thumb',
+    'image5',
+    'image5_thumb'
+  ]
+
+  if (!exceptions.includes(key))
+    { json_input[key]=sntz(json_input[key]) }
+  
+}
+//we should sanitize here other no string
+
+}
+
+// console.log(" "+service_name+" INPUT SANITIZED :"+JSON.stringify(json_input) );
+return json_input
+}
