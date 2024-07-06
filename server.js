@@ -246,6 +246,14 @@ async function is_valid_token_session(session)
   
   console.log("RESULT GET SESSION DATA BY TOKEN : "+JSON.stringify(result.rows))
 
+
+  if (result == null ||  result.rows[0] == null || result.rows[0].token == null  )
+    {
+      console.log("ERROR SESSION is NULL :"+session.id+" " )
+      return false
+    }
+  
+
 // 1.- Check if LAST Token exist in DB for this user is the token provided. 
   if (result.rows[0].token == session.token )
   { console.log("SESSION TOKEN Validation for UserId:"+session.id+" "+session.token+"  OK " ) }
