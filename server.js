@@ -233,6 +233,12 @@ async function is_valid_token_session(session)
 { 
   console.log("validateToken : "+JSON.stringify(session))
 
+  if (session == null || session.id ==null)
+  { 
+    console.log("ERROR SESSION is NULL in the request  " )
+    return false
+  }
+
   const { Client } = require('pg')
   const client = new Client(conn_data)
   client.connect() 
@@ -249,7 +255,7 @@ async function is_valid_token_session(session)
 
   if (result == null ||  result.rows[0] == null || result.rows[0].token == null  )
     {
-      console.log("ERROR SESSION is NULL :"+session.id+" " )
+      console.log("ERROR SESSION is NULL in DB :"+session.id+" " )
       return false
     }
   
