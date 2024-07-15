@@ -1,3 +1,5 @@
+#sudo systemctl start reusar
+
 [Unit]
 Description=Reusar
 
