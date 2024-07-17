@@ -833,10 +833,33 @@ app.route('/public_search_objects_by_category')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
+
+
+  let limitedTo = 3
+
+
+
+  if (req.body.limited !=null &&  !(req.body.limited === undefined || req.body.limited === 'undefined' )  )
+  {
+    limitedTo = req.body.limited
+  } 
+
+/*
+  if (req.body.limited === undefined)
+  {
+    limitedTo= 3
+  }
+
+  if (req.body.limited === 'undefined')
+  {
+    limitedTo= 3
+  }
+  */
+
   let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) 
-  AND ( category1 IN (${req.body.search_categories})  OR category2 IN (${req.body.search_categories}) OR category3 IN (${req.body.search_categories})    )  LIMIT 21 ; 
+  AND ( category1 IN (${req.body.search_categories})  OR category2 IN (${req.body.search_categories}) OR category3 IN (${req.body.search_categories})    )  LIMIT ${limitedTo} ; 
   `
- // console.log("QUERY Insert User  :"+query_insert_img);
+ console.log("QUERY public_search_objects_by_category :"+query_search_object);
      
  const resultado = client.query(query_search_object , (err, result) => {
 
