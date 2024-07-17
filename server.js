@@ -669,7 +669,7 @@ app.route('/public_search_objects')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  LIMIT 12  ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  LIMIT 21  ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -779,7 +779,7 @@ app.route('/public_search_objects_last')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) ORDER BY id DESC  LIMIT 9  ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) ORDER BY id DESC  LIMIT 39  ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -834,7 +834,7 @@ app.route('/public_search_objects_by_category')
   let json_response = null ;
   let timestamp= new Date().getTime();
   let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) 
-  AND ( category1 IN (${req.body.search_categories})  OR category2 IN (${req.body.search_categories}) OR category3 IN (${req.body.search_categories})    )  LIMIT 6 ; 
+  AND ( category1 IN (${req.body.search_categories})  OR category2 IN (${req.body.search_categories}) OR category3 IN (${req.body.search_categories})    )  LIMIT 21 ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
