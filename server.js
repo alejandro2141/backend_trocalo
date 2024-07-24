@@ -54,7 +54,8 @@ app.use(function(req, res, next) {
     '/public_register_user',
     '/private_get_all_comments',
     '/private_fix_comment',
-    '/public_search_objects_by_text'
+    '/public_search_objects_by_text',
+    '/private_update_proposal_paymen'
   ]
   
   if ( req.method == "POST" && !exceptionOnValidation.includes(req.url) )
@@ -1359,6 +1360,79 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
 
 
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      PRIVATE UPDATE PROPOSAL  PAYMENT         ***************************************** */
+/****************        07-20-2024                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments: 
+//  
+/******************************************************************************************************** */
+
+
+app.route('/private_update_proposal_payment')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_update_proposal_payment  REQUEST: "+JSON.stringify(req.body))
+
+  let timestamp= new Date().toISOString();
+
+  let sql_query = `UPDATE proposal SET 
+  payment_type = ${req.body.payment_type}  ,
+  timestamp_payment_type = now()  , status  = 200 ` 
+
+// *** IF PAYMENT ON DELIVER *****
+  /*
+  if (req.body.payment_type == 2)
+  {
+  sql_query = sql_query + ` , status  = 200 `
+  }
+  */
+// *******************************
+  sql_query =sql_query + ` WHERE id= ${req.body.proposal_id} ; `
+
+
+console.log("SQL UPDATE PROPOSAL:"+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+        client.end()  
+    }
+    else 
+    {
+      if (result !=null)
+        {
+          console.log('RESULT private_update_proposal'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          client.end()  
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+    
+})
+,
+
+
+
 
 
 /******************************************************************************************************** */
@@ -1368,9 +1442,13 @@ console.log("  SQL INSERT PROPOSAL : "+sql_query);
 /****************        05-01-2023                             ***************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
-// Comments:
-// 
+// Comments: when it is used ? 
+//  
 /******************************************************************************************************** */
+
+
+
+
 
 
 app.route('/private_update_proposal')
