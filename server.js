@@ -1970,8 +1970,8 @@ let sql_query = `INSERT INTO invitation (email,status,user_id,timestamp,sent) VA
 */
 let sql_query = `
 UPDATE user_created SET invitations = (invitations - 1)  WHERE id=${req.body.session_data.id}  returning invitations ;
-INSERT INTO invitation (email,status,user_id,timestamp,sent) VALUES 
-( '${req.body.email}' , 100 , ${req.body.session_data.id} , NOW(), false  ) RETURNING *
+INSERT INTO invitation (email,status,user_id,timestamp,sent, friend_name  ) VALUES 
+( '${req.body.email}' , 100 , ${req.body.session_data.id} , NOW(), false , '${req.body.session_data.name}' ) RETURNING *
 `
 
 
