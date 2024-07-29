@@ -55,7 +55,8 @@ app.use(function(req, res, next) {
     '/private_get_all_comments',
     '/private_fix_comment',
     '/public_search_objects_by_text',
-    '/private_update_proposal_paymen'
+    '/private_update_proposal_paymen',
+    '/public_validate_invitation_code',
   ]
   
   if ( req.method == "POST" && !exceptionOnValidation.includes(req.url) )
@@ -1249,7 +1250,7 @@ app.route('/save_proposal')
   sql_columns_val = sql_columns_val.concat( ","+req.body.object_wanted.owner_id ) 
 
   sql_columns     = sql_columns.concat( ",amount" ) 
-  sql_columns_val = sql_columns_val.concat( ",10000 " ) 
+  sql_columns_val = sql_columns_val.concat( ",5000 " ) 
 
   sql_columns     = sql_columns.concat( ",status" ) 
   sql_columns_val = sql_columns_val.concat( ",1" ) 
@@ -2005,6 +2006,60 @@ console.log("/private_send_invitation : "+sql_query);
   
     })
     
+})
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************  Verificacion de codigo Invitacion       ********************************************** */
+/****************        29-07-2023                        ********************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/public_validate_invitation_code')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/public_search_objects  REQUEST: "+JSON.stringify(req.body))
+ 
+  let json_response = null ;
+  let timestamp= new Date().getTime();
+  let query_get_invitation = `SELECT * FROM  user_invitation  WHERE  code = ${req.body.invitation_code} ` ; 
+  
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(query_get_invitation , (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+query_get_invitation ) ;
+      console.log(' ERR = '+err ) ;
+      client.end()  
+  }
+  else 
+  {
+    if (result !=null)
+      {
+      console.log('RESULT public_validate_invitation_code'+JSON.stringify(result.rows) ) ;
+      client.end()  
+      res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        client.end()  
+        res.status(200).send( null ) ;
+      }
+
+  }
+
+  })
+
 })
 
 
