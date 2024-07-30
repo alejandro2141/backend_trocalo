@@ -859,7 +859,7 @@ app.route('/public_search_objects_by_category')
   */
 
   let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) 
-  AND ( category1 IN (${req.body.search_categories})  OR category2 IN (${req.body.search_categories}) OR category3 IN (${req.body.search_categories})    )  LIMIT ${limitedTo} ; 
+  AND ( category1 IN (${req.body.search_categories})  OR category2 IN (${req.body.search_categories}) OR category3 IN (${req.body.search_categories})    ) ORDER BY id DESC LIMIT ${limitedTo} ; 
   `
  console.log("QUERY public_search_objects_by_category :"+query_search_object);
      
