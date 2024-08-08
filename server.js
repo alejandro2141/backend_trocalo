@@ -395,6 +395,64 @@ const resultado2 = client2.query(query_insert_user, (err, result) => {
 
 
 
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************      PUBLIC UPDATE USER DATA 6-08-2024    ********************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// sanitized 6-08-2024 
+// validated 6-08-2024
+/******************************************************************************************************** */
+app.route('/private_update_user_data')
+.post(function (req, res) {
+   // console.log('professional_shutdown_tutorial INPUT : ', req.body );
+   //req.body=sntz_json(req.body,"/professional_shutdown_tutorial")
+// ****** Connect to postgre
+const { Client } = require('pg')
+const client = new Client(conn_data)
+client.connect() 
+
+console.log("REQUEST: "+JSON.stringify(req.body))
+
+let query_update_user_creation = `
+UPDATE user_created SET 
+address_street_name = '${req.body.address_street}', 
+address_street_number = '${req.body.address_street_number}',
+phone = '${req.body.phone}',  
+address_location_zone = '${req.body.address_location_commune}'  ,
+address_street_apartment  =  '${req.body.address_apartment}' 
+WHERE id = '${req.body.session_data.id}'  
+RETURNING *   ;` 
+
+console.log("QUERY UPDATE user_created :"+query_update_user_creation);
+
+const resultado = client.query(query_update_user_creation, (err, result) => {
+    //res.status(200).send(JSON.stringify(result)) ;
+    if (err) {
+      console.log('/private_update_user_data ERR:'+err ) ;
+    }
+    else {
+    console.log("private_update_user_data JSON RESPONSE BODY : "+JSON.stringify(resultado));
+     res.status(200).send(JSON.stringify(resultado) );
+    }
+    client.end()
+})
+
+
+
+})
+
+
+
+
+
+
+
+
 /******************************************************************************************************** */
 /******************************************************************************************************** */
 /****************                                          ********************************************** */
