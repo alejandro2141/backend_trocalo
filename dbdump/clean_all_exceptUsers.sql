@@ -5,5 +5,9 @@
 TRUNCATE user_object ; 
 TRUNCATE invitation ; 
 TRUNCATE proposal ; 
+TRUNCATE session ;
+TRUNCATE invitation ;
+TRUNCATE user_creation ;
+TRUNCATE user_created ;
 TRUNCATE session ; 
 
