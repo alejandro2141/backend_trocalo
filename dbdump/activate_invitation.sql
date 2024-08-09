@@ -1,0 +1,1 @@
+UPDATE user_created SET invitations = 1
