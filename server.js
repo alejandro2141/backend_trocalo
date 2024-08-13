@@ -52,11 +52,19 @@ app.use(function(req, res, next) {
     '/public_search_objects_by_category', 
     '/public_login_user',
     '/public_register_user',
-    '/private_get_all_comments',
-    '/private_fix_comment',
+    
+    
     '/public_search_objects_by_text',
     '/private_update_proposal_paymen',
     '/public_validate_invitation_code',
+
+    '/private_get_all_users',
+    '/private_fix_comment',
+    '/private_get_all_comments',
+    '/private_get_all_invitations',
+    '/private_get_all_proposals',
+    '/private_login_admin_portal',
+
   ]
   
   if ( req.method == "POST" && !exceptionOnValidation.includes(req.url) )
@@ -2122,18 +2130,200 @@ app.route('/public_validate_invitation_code')
 
 
 
+// ***********************************************************************************************************
+// ***********************************************************************************************************
+// ***************************   START ADMIN MONITORING  *****************************************************
+// ***********************************************************************************************************
+// ***********************************************************************************************************
+// ***********************************************************************************************************
+
+
+app.route('/private_login_admin_portal')
+.post(function (req, res) {
+
+
+  if (req.body.username != "admin")
+  {
+     res.status(200).send( null ) 
+  }
+  if (req.body.password != "matilde")
+  {
+     res.status(200).send( null ) 
+  }
+
+  let json_response = {
+      response_code : 200
+  }
+
+  res.status(200).send(JSON.stringify(json_response)) ;
+  
+  
+})
+    
+
 
 /******************************************************************************************************** */
-/******************************************************************************************************** */
-/****************                                               ***************************************** */
-/****************         GET  ALL COMMENTS                     ***************************************** */
-/****************        08-01-2023                             ***************************************** */
-/******************************************************************************************************** */
+/****************         GET  ALL INVITATIONS                  ***************************************** */
+/****************        12-08-2024                             ***************************************** */
 /******************************************************************************************************** */
 // Comments:
 // 
 /******************************************************************************************************** */
 
+app.route('/private_get_all_proposals')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_all_proposals  REQUEST: "+JSON.stringify(req.body))
+
+let sql_query = `SELECT * FROM proposal ORDER BY id DESC ; `
+
+console.log("private_get_all_proposals : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+        client.end()  
+    }
+    else 
+    {
+      if (result !=null)
+        {
+          console.log('RESULT private_get_all_proposals'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          client.end()  
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+/******************************************************************************************************** */
+/****************         GET  ALL INVITATIONS                  ***************************************** */
+/****************        12-08-2024                             ***************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_get_all_invitations')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_all_invitations  REQUEST: "+JSON.stringify(req.body))
+
+let sql_query = `SELECT * FROM invitation ORDER BY id DESC ; `
+
+console.log("private_get_all_invitations : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+        client.end()  
+    }
+    else 
+    {
+      if (result !=null)
+        {
+          console.log('RESULT private_get_all_invitations'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          client.end()  
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+/******************************************************************************************************** */
+/****************         GET  ALL USERS                        ***************************************** */
+/****************        12-08-2024                             ***************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+app.route('/private_get_all_users')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_get_all_users  REQUEST: "+JSON.stringify(req.body))
+
+let sql_query = `SELECT  id, names, last_name1, last_name2, email, phone, address_street_name,
+ address_reference , timestamp, address_location_zone , register_confirmation_sent, address_street_number ,
+ address_street_apartment   FROM user_created   ORDER BY id DESC ; `
+
+console.log("private_get_all_users : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log(' ERROR QUERY = '+sql_query ) ;
+        console.log(' ERR = '+err ) ;
+        client.end()  
+    }
+    else 
+    {
+      if (result !=null)
+        {
+          console.log('RESULT private_get_all_users'+JSON.stringify(result.rows) ) ;
+          client.end()  
+          res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          client.end()  
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+/******************************************************************************************************** */
+/****************         GET  ALL COMMENTS                     ***************************************** */
+/****************        08-01-2023                             ***************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
 
 app.route('/private_get_all_comments')
 .post(function (req, res) {
@@ -2143,7 +2333,6 @@ app.route('/private_get_all_comments')
   client.connect() 
   
   console.log("/private_get_all_comments  REQUEST: "+JSON.stringify(req.body))
-//{"text_message":"aaaaaaaaaaaa","feeling":2,"timestamp":"2024-01-09T13:27:06.458Z"}
 
 let sql_query = `SELECT * FROM comment   ORDER BY id DESC ; `
 
@@ -2289,6 +2478,16 @@ console.log("private_unfix_comment : "+sql_query);
     })
     
 })
+
+
+
+// ***********************************************************************************************************
+// ***********************************************************************************************************
+// ***************************   END  ADMIN MONITORING  ******************************************************
+// ***********************************************************************************************************
+// ***********************************************************************************************************
+// ***********************************************************************************************************
+
 
 
 // ************************************************************************************************************
