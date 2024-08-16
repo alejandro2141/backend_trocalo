@@ -65,6 +65,8 @@ app.use(function(req, res, next) {
     '/private_get_all_proposals',
     '/private_login_admin_portal',
 
+    '/private_get_objects',
+
   ]
   
   if ( req.method == "POST" && !exceptionOnValidation.includes(req.url) )
