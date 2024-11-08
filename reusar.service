@@ -14,8 +14,8 @@ Environment=PATH=/usr/bin:/usr/local/bin
 Environment=NODE_ENV=production
 WorkingDirectory=/tmp/
 
-StandardOutput=append:/var/log/intercambiarlog/StandarOutput.log
-StandardError=append:/var/log/intercambiarlog/StandarError.log
+StandardOutput=file:/var/log/intercambiarlog/StandarOutput.log
+StandardError=file:/var/log/intercambiarlog/StandarError.log
 
 
 [Install]
