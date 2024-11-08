@@ -723,7 +723,7 @@ async function saveImageProduct(imageB64, filename  )
 /****************                                          ********************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
-// Comments:
+// Comments: Seems we are not using this funciton once SEarchByCategory replace it for all search category
 // 
 /******************************************************************************************************** */
 
@@ -734,7 +734,7 @@ app.route('/public_search_objects')
   const client = new Client(conn_data)
   client.connect() 
   
-  console.log("/public_search_objects  REQUEST: "+JSON.stringify(req.body))
+  console.log("/public_search_objects (EVALUATE TO REMOVE) REQUEST: "+JSON.stringify(req.body))
  
   let json_response = null ;
   let timestamp= new Date().getTime();
@@ -754,7 +754,7 @@ app.route('/public_search_objects')
   {
     if (result !=null)
       {
-      console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+      console.log('RESULT public_search_objects (EVALUATE TO REMOVE) '+JSON.stringify(result.rows) ) ;
       client.end()  
       res.status(200).send(JSON.stringify(result.rows) );
       }
@@ -779,7 +779,7 @@ app.route('/public_search_objects')
 /****************                                          ********************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
-// Comments:
+// Comments: Updae to limit from 50 to 150
 // 
 /******************************************************************************************************** */
 
@@ -794,7 +794,7 @@ app.route('/public_search_objects_by_text')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  AND ( UPPER(title) LIKE UPPER('%${req.body.search_text}%') )  ORDER BY id DESC  LIMIT 50  ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL )  AND ( UPPER(title) LIKE UPPER('%${req.body.search_text}%') )  ORDER BY id DESC  LIMIT 150  ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -833,8 +833,8 @@ app.route('/public_search_objects_by_text')
 /****************                                          ********************************************** */
 /******************************************************************************************************** */
 /******************************************************************************************************** */
-// Comments:
-// 
+// Comments: Seems we are not using this function once SearchOBject by category replace it for all search categories 
+//  Evaluate remove it
 /******************************************************************************************************** */
 
 app.route('/public_search_objects_last')
@@ -844,11 +844,11 @@ app.route('/public_search_objects_last')
   const client = new Client(conn_data)
   client.connect() 
   
-  console.log("/public_search_objects  REQUEST: "+JSON.stringify(req.body))
+  console.log("/public_search_objects_last  (TO BE REMOVED) REQUEST: "+JSON.stringify(req.body))
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) ORDER BY id DESC   ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) ORDER BY id DESC  ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
@@ -864,7 +864,7 @@ app.route('/public_search_objects_last')
   {
     if (result !=null)
       {
-        console.log('RESULT public_search_objects'+JSON.stringify(result.rows) ) ;
+        console.log('RESULT public_search_objects_last'+JSON.stringify(result.rows) ) ;
         client.end()  
         res.status(200).send(JSON.stringify(result.rows) );
       }
