@@ -848,7 +848,7 @@ app.route('/public_search_objects_last')
  
   let json_response = null ;
   let timestamp= new Date().getTime();
-  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) ORDER BY id DESC  LIMIT 39  ; 
+  let query_search_object = `SELECT * FROM  user_object  WHERE  (deleted_by_owner = FALSE  OR  deleted_by_owner IS  NULL ) AND  ( blocked_due_proposal_accepted = FALSE OR  blocked_due_proposal_accepted IS  NULL ) ORDER BY id DESC   ; 
   `
  // console.log("QUERY Insert User  :"+query_insert_img);
      
