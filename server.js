@@ -8,9 +8,10 @@ const { json } = require('body-parser');
 const PORT = 8080;
 const HOST = '0.0.0.0';
 
-// path Devel
+//important every time update production environment this value must change
+// PATH DEVEL
 const PATH_PROD_IMG = '../trocalo/public/productImages/'
-// path Prod
+// PATH PRODUCTION AWS 
 //const PATH_PROD_IMG = '/var/www/html/public/productImages/'
 
 
@@ -65,6 +66,8 @@ app.use(function(req, res, next) {
     '/private_login_admin_portal',
 
     '/private_get_objects',
+    '/private_send_recover_password' ,
+    '/private_reset_password',
 
   ]
   
@@ -2005,8 +2008,181 @@ console.log("private_get_comments : "+sql_query);
 
 
 
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                                               ************************* */
+/****************      PRIVATE SEND REQUEST TO RECOVER PASSWORD RESET           ************************* */
+/****************        12-11-2024                                             ************************* */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
 
 
+app.route('/private_send_recover_password')
+.post(function (req, res) {
+
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+  console.log("/private_send_recover_password  REQUEST: "+JSON.stringify(req.body))
+
+let sql_query = `
+INSERT INTO user_reset_password (email, status , timestamp ,sent_attempt ) VALUES ('${req.body.email}' , 0 , NOW() , 0 ) returning *  ; 
+`
+
+console.log("/private_send_recover_password : "+sql_query);
+
+    const resultado = client.query(sql_query, (err, result) => {
+
+    if (err) 
+    {
+        console.log('/private_send_recover_password ERROR QUERY = '+sql_query ) ;
+        console.log('/private_send_recover_password ERR = '+err ) ;
+        client.end()  
+    }
+    else 
+    {
+      if (result !=null)
+        {
+        console.log('RESULT /private_send_recover_password '+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
+        }
+        else
+        {
+          client.end()  
+          res.status(200).send( null ) ;
+        }
+    }
+
+    client.end()
+  
+    })
+    
+})
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                               ***************************************** */
+/****************      BACKEND RESET PASSWORD                   ***************************************** */
+/****************        12-11-2024                             ***************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:Require input validation
+// 
+/******************************************************************************************************** */
+
+
+app.route('/private_reset_password')
+.post(function (req, res) {
+
+  console.log("/private_reset_password  REQUEST: "+JSON.stringify(req.body))
+  private_reset_password(req).then(result => { res.status(200).send(JSON.stringify(result) ); }   )
+    
+})
+
+
+async function private_reset_password(req)
+{ 
+
+  let json_response = { 
+      error: null ,
+      code: 0,
+      message: "" 
+    }
+
+ //1.- FIRST CHECK TIMESTAMP 
+ //  Check a change password request was made. 
+ let result_validation =  await validateTimestampRequest(req.body.email)
+ console.log("/private_reset_password  Check Time validation to change password :"+req.body.email+" Result:"+result_validation )
+   // IF VALIDATION FAILED, THEN 
+   if (!result_validation)
+   {
+    console.log("/private_reset_password FAILED attempt to reset password is outdated :"+req.body.email )
+
+    json_response.message = "Cannot process your requirements due failed input data or validation " ,
+    json_response.code = 1001 ,
+    json_response.error = true  
+    
+    return (json_response)
+   }
+  // 2.- THEN PROCEED to change Password
+
+   else 
+   {
+    let result  =  await changePasswd(req)
+    json_response.message = "Validation Token Timestamp Success, pass changed" ,
+    json_response.code = 100 ,
+    json_response.error = false  
+
+    return (json_response)
+   }
+
+
+}
+
+
+// ***************************************************************
+//  Validate timeStamp  12-11-2024
+// ***************************************************************
+async function validateTimestampRequest(email)
+{ 
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  await client.connect() 
+
+  let sql_query = `
+  SELECT timestamp from user_reset_password WHERE email='${email}' ORDER BY id DESC  ; 
+           `
+  const res = await client.query(sql_query) 
+  client.end() 
+
+  console.log("RES :"+JSON.stringify(res))
+  if (res.rows.length == 0  )
+  {
+    console.log("/private_reset_password ERROR Request Mail not Found") 
+    return false
+  }
+ 
+  console.log("/private_reset_password TIMESTAMP:"+JSON.stringify(res.rows[0].timestamp ) ) 
+
+  const cdate  = new Date();
+  const rdate = new Date(res.rows[0].timestamp)
+
+  console.log("/private_reset_password  Validate cdate  :"+cdate+" rdate :"+rdate )  
+
+        if ( (cdate.getTime() - rdate.getTime() ) < (1000 * 60 * 30 ))
+        {
+            return true 
+        }
+        else 
+        {
+            return false 
+        }
+  
+}
+
+// ***************************************************************
+//  change Password    12-11-2024
+// ***************************************************************
+async function changePasswd(req)
+{ 
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  await client.connect() 
+
+  let sql_query = `
+      UPDATE user_created SET passwd = '${req.body.passwd}'  WHERE email='${req.body.email}' returning *
+      `
+ const res = await client.query(sql_query) 
+  client.end() 
+  
+  return res.rows[0] ;
+}
 
 
 
