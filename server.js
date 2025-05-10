@@ -68,6 +68,7 @@ app.use(function(req, res, next) {
     '/private_get_objects',
     '/private_send_recover_password' ,
     '/private_reset_password',
+    '/admin_private_delete_object',
 
   ]
   
@@ -2328,6 +2329,8 @@ app.route('/private_login_admin_portal')
      res.status(200).send( null ) 
   }
 
+
+
   let json_response = {
       response_code : 200
   }
@@ -2655,6 +2658,64 @@ console.log("private_unfix_comment : "+sql_query);
     })
     
 })
+
+
+
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+/****************                                          ********************************************** */
+/****************    ADMIN  DELETE OBJECT 10-05-2025            ***************************************** */
+/****************                                          ********************************************** */
+/******************************************************************************************************** */
+/******************************************************************************************************** */
+// Comments:
+// 
+/******************************************************************************************************** */
+
+
+
+app.route('/admin_private_delete_object')
+.post(function (req, res) {
+
+
+  console.log("/admin_private_delete_object  REQUEST: "+JSON.stringify(req.body))
+    
+  const { Client } = require('pg')
+  const client = new Client(conn_data)
+  client.connect() 
+  
+
+  let sql = `UPDATE user_object SET deleted_by_owner = TRUE  WHERE id= '${req.body.id}'  `
+
+
+ // console.log("QUERY Insert User  :"+query_insert_img);
+     
+ const resultado = client.query(sql, (err, result) => {
+
+  if (err) 
+  {
+      console.log(' ERROR QUERY = '+sql ) ;
+      console.log(' ERR = '+err ) ;
+  }
+  else 
+  {
+    if (result !=null)
+      {
+        console.log('RESULT private_delete_object'+JSON.stringify(result.rows) ) ;
+        client.end()  
+        res.status(200).send(JSON.stringify(result.rows) );
+      }
+      else
+      {
+        client.end()  
+        res.status(200).send( null ) ;
+      }
+  }
+
+  })
+
+})
+
 
 
 
