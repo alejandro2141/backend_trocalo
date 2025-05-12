@@ -2696,21 +2696,22 @@ app.route('/admin_private_delete_object')
   {
       console.log(' ERROR QUERY = '+sql ) ;
       console.log(' ERR = '+err ) ;
+      res.status(401).send(err );
   }
   else 
   {
     if (result !=null)
       {
-        console.log('RESULT private_delete_object'+JSON.stringify(result.rows) ) ;
-        client.end()  
+        console.log('RESULT private_delete_object'+JSON.stringify(result.rows) ) ; 
         res.status(200).send(JSON.stringify(result.rows) );
       }
       else
       {
-        client.end()  
         res.status(200).send( null ) ;
       }
+      client.end()  
   }
+  client.end()
 
   })
 
